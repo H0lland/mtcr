@@ -71,6 +71,44 @@ int nextService2(cloudlet cl, int numSer, int stor[]){
 	return (pos+1);
 }
 
+//Greedy Global Algorithm 3: Select services based on number of tasks of a type of service across the entire system
+std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
+	int buckets[numSer];
+	//initialize buckets
+	for(int i = 0; i < numSer; i++){
+		buckets[i] = 0;
+	}
+	for(int i = 0; i < cls.size(); i++){
+		vector<int> servs = cls.at(i).getServs();
+		vector<user> users = cls.at(i).getUsers();
+		//count occurences for each service
+		for(int j = 0; j < users.size(); j++){
+			vector<task> tasks = users.at(j).getTasks();
+			for(int k = 0; k < tasks.size(); k++){
+				int serv = tasks.at(k).getType();
+				buckets[serv-1]++;
+				}
+		}
+	}
+	int i = 0;
+	vector<int> rtn;
+	//make this take into account the storage restraint
+	while(i < 3){
+		float max = 0;
+		int pos = 0;
+		//pick the next service needed
+		for(int j = 0; j < numSer; j++){
+			float profit = buckets[j]/stor[j]; //determine profit as tasks over cost
+			if(profit > max){
+				max = profit;
+				pos = j;
+			}
+		}
+		rtn.push_back(pos+1);
+	}
+	return rtn;
+}
+
 int main(){
 	cout << "Hello" << endl;
 	int numUsers = 4;
@@ -97,6 +135,7 @@ int main(){
 	int serv5In = 0;
 	int serv5Out = 0;
 	int serv5Comp = 0;
+
 	//create tasks of service 1
 	task* task1 = new task(serv1In, serv1Out, serv1Comp, 1);
 	task* task7 = new task(serv1In, serv1Out, serv1Comp, 1);	
@@ -111,7 +150,7 @@ int main(){
 	task* task9 = new task(serv4In, serv4Out, serv4Comp, 4);
 	//create tasks of service 5
 	task* task2 = new task(serv5In, serv5Out, serv5Comp, 5);
-	
+
 	//create user1
 	user* user1 = new user();
 	user1->addTask(*task1);
@@ -138,7 +177,7 @@ int main(){
 	user4->addQos(0);
 	user4->addTask(*task9);
 	user4->addQos(0);
-	
+
 	//create cloudlet1
 	cloudlet* cl1 = new cloudlet(0,0,0);
 	cl1->addUser(*user1);
