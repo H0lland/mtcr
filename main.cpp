@@ -3,20 +3,29 @@
 #include<vector>
 using namespace std;
 
-//function which calculates how much storage a cloudlet has left
-int remainingStor(cloudlet cl, int stor[]){
-	int rtn = cl.getStor();
-	vector<int> servs = cl.getServs();
-	for(int i = 0; i < servs.size(); i++){
-		rtn -= stor[servs.at(i)-1];
+//Servible: determine if a task is servible by a cloudlet (assuming the proper service is placed on that cloudlet
+bool servible(int pos, user U, cloudlet cl){
+	//initializations
+	bool servible = 1;
+	bool local = 0;
+	task* tas = U.getTasks().at(pos);
+	int serv = tas->getType();
+	int key = U.getKey();
+	vector<user> users = cl.getUsers();
+	//see if user is connected to cloudlet	
+	for(int i = 0; i< users.size(); i++){
+		if(key == users.at(i).getKey())
+			local = 1;
 	}
-	return rtn;
+	if(local){
+		
+	}
+	return servible;
 }
-
 //Greedy Local Algorithm 1: pick tasks by tasks/storage metric
 int nextService1(cloudlet cl, int numSer, int stor[]){
 	int buckets[numSer];
-	int remain = remainingStor(cl, stor);
+	int remain = cl.getRemStor(); 
 	//initialize buckets
 	for(int i = 0; i < numSer; i++){
 		buckets[i] = 0;
@@ -47,7 +56,7 @@ int nextService1(cloudlet cl, int numSer, int stor[]){
 //Greedy Local Algorithm 2: pick tasks by num users served/storage metric
 int nextService2(cloudlet cl, int numSer, int stor[]){
 	int buckets[numSer];
-	int remain = remainingStor(cl, stor);
+	int remain = cl.getRemStor();
 	//initialize buckets
 	for(int i = 0; i < numSer; i++){
 		buckets[i] = 0;
@@ -83,7 +92,7 @@ int nextService2(cloudlet cl, int numSer, int stor[]){
 	return (pos+1);
 }
 
-//Greedy Global Algorithm 3: Select services based on number of tasks of a type of service across the entire system
+//Greedy Global Algorithm 1: Select services based on number of tasks of a type of service across the entire system
 std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
 	int buckets[numSer];
 	//initialize buckets
@@ -94,7 +103,7 @@ std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
 	for(int i = 0; i < cls.size(); i++){
 		vector<int> servs = cls.at(i).getServs();
 		vector<user> users = cls.at(i).getUsers();
-		remain += remainingStor(cls.at(i), stor);
+		remain += cls.at(i).getRemStor();	
 		//count occurences for each service
 		for(int j = 0; j < users.size(); j++){
 			vector<task> tasks = users.at(j).getTasks();
@@ -152,40 +161,40 @@ int main(){
 	int serv5Comp = 1;
 
 	//create tasks of service 1
-	task* task1 = new task(serv1In, serv1Out, serv1Comp, 1);
-	task* task7 = new task(serv1In, serv1Out, serv1Comp, 1);	
+	task* task1 = new task(serv1In, serv1Out, serv1Comp, 0);
+	task* task7 = new task(serv1In, serv1Out, serv1Comp, 0);	
 	//create tasks of service 2
-	task* task4 = new task(serv2In, serv2Out, serv2Comp, 2);
+	task* task4 = new task(serv2In, serv2Out, serv2Comp, 1);
 	//create tasks of service 3
-	task* task3 = new task(serv3In, serv3Out, serv3Comp, 3);	
-	task* task5 = new task(serv3In, serv3Out, serv3Comp, 3);
-	task* task6 = new task(serv3In, serv3Out, serv3Comp, 3);
+	task* task3 = new task(serv3In, serv3Out, serv3Comp, 2);	
+	task* task5 = new task(serv3In, serv3Out, serv3Comp, 2);
+	task* task6 = new task(serv3In, serv3Out, serv3Comp, 2);
 	//create tasks of service 4
-	task* task8 = new task(serv4In, serv4Out, serv4Comp, 4);
-	task* task9 = new task(serv4In, serv4Out, serv4Comp, 4);
+	task* task8 = new task(serv4In, serv4Out, serv4Comp, 3);
+	task* task9 = new task(serv4In, serv4Out, serv4Comp, 3);
 	//create tasks of service 5
-	task* task2 = new task(serv5In, serv5Out, serv5Comp, 5);
+	task* task2 = new task(serv5In, serv5Out, serv5Comp, 4);
 
 	//create user1
-	user* user1 = new user();
+	user* user1 = new user(1);
 	user1->addTask(*task1);
 	user1->addQos(0);
 	user1->addTask(*task2);
 	user1->addQos(0);
 	//create user2
-	user*user2 = new user();
+	user*user2 = new user(2);
 	user2->addTask(*task3);
 	user2->addQos(0);
 	user2->addTask(*task4);
 	user2->addQos(0);
 	//create user3
-	user* user3 = new user();
+	user* user3 = new user(3);
 	user3->addTask(*task5);
 	user3->addQos(0);
 	user3->addTask(*task6);
 	user3->addQos(0);
 	//create user4
-	user* user4 = new user();
+	user* user4 = new user(4);
 	user4->addTask(*task7);
 	user4->addQos(0);
 	user4->addTask(*task8);

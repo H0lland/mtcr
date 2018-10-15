@@ -1,7 +1,13 @@
 #include "user.h"
 using std::vector;
 
-user::user(){};
+user::user(int n){
+	key = n;
+}
+
+int user::getKey(){
+	return key;
+}
 
 std::vector<int> user::getQos(){
 	return qos;
