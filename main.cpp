@@ -3,9 +3,20 @@
 #include<vector>
 using namespace std;
 
+//function which calculates how much storage a cloudlet has left
+int remainingStor(cloudlet cl, int stor[]){
+	int rtn = cl.getStor();
+	vector<int> servs = cl.getServs();
+	for(int i = 0; i < servs.size(); i++){
+		rtn -= stor[servs.at(i)-1];
+	}
+	return rtn;
+}
+
 //Greedy Local Algorithm 1: pick tasks by tasks/storage metric
 int nextService1(cloudlet cl, int numSer, int stor[]){
 	int buckets[numSer];
+	int remain = remainingStor(cl, stor);
 	//initialize buckets
 	for(int i = 0; i < numSer; i++){
 		buckets[i] = 0;
@@ -25,7 +36,7 @@ int nextService1(cloudlet cl, int numSer, int stor[]){
 	//pick the next service needed
 	for(int i = 0; i < numSer; i++){
 		float profit = buckets[i]/stor[i]; //determine profit as tasks over cost
-		if(profit > max){
+		if(profit > max && stor[i] <= remain){
 			max = profit;
 			pos = i;
 		}
@@ -36,6 +47,7 @@ int nextService1(cloudlet cl, int numSer, int stor[]){
 //Greedy Local Algorithm 2: pick tasks by num users served/storage metric
 int nextService2(cloudlet cl, int numSer, int stor[]){
 	int buckets[numSer];
+	int remain = remainingStor(cl, stor);
 	//initialize buckets
 	for(int i = 0; i < numSer; i++){
 		buckets[i] = 0;
@@ -63,7 +75,7 @@ int nextService2(cloudlet cl, int numSer, int stor[]){
 	//pick the next service needed
 	for(int i = 0; i < numSer; i++){
 		float profit = buckets[i]/stor[i]; //determine profit as tasks over cost
-		if(profit > max){
+		if(profit > max && stor[i] <= remain){
 			max = profit;
 			pos = i;
 		}
@@ -78,9 +90,11 @@ std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
 	for(int i = 0; i < numSer; i++){
 		buckets[i] = 0;
 	}
+	int remain = 0; //variable to store total remaining storage
 	for(int i = 0; i < cls.size(); i++){
 		vector<int> servs = cls.at(i).getServs();
 		vector<user> users = cls.at(i).getUsers();
+		remain += remainingStor(cls.at(i), stor);
 		//count occurences for each service
 		for(int j = 0; j < users.size(); j++){
 			vector<task> tasks = users.at(j).getTasks();
@@ -105,6 +119,7 @@ std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
 			}
 		}
 		rtn.push_back(pos+1);
+		i+=1;
 	}
 	return rtn;
 }
@@ -116,25 +131,25 @@ int main(){
 	int numServices = 5;
 	int storageCosts [5] = {1,1,1,1,1};	
 	//base parameters for a task of type service 1
-	int serv1In = 0;
+	int serv1In = 1;
 	int serv1Out = 0;
-	int serv1Comp = 0;
+	int serv1Comp = 1;
 	//base parameters for a task of type service 2	
-	int serv2In = 0;
+	int serv2In = 1;
 	int serv2Out = 0;
-	int serv2Comp = 0;
+	int serv2Comp = 1;
 	//base parameters for a task of type service 3
-	int serv3In = 0;
+	int serv3In = 1;
 	int serv3Out = 0;
-	int serv3Comp = 0;
+	int serv3Comp = 1;
 	//base parameters for a task of type service 4
-	int serv4In = 0;
+	int serv4In = 1;
 	int serv4Out = 0;
-	int serv4Comp = 0;
+	int serv4Comp = 1;
 	//base parameters for a task of type service 5
-	int serv5In = 0;
+	int serv5In = 1;
 	int serv5Out = 0;
-	int serv5Comp = 0;
+	int serv5Comp = 1;
 
 	//create tasks of service 1
 	task* task1 = new task(serv1In, serv1Out, serv1Comp, 1);
@@ -179,9 +194,14 @@ int main(){
 	user4->addQos(0);
 
 	//create cloudlet1
-	cloudlet* cl1 = new cloudlet(0,0,0);
+	cloudlet* cl1 = new cloudlet(2,5,4);
 	cl1->addUser(*user1);
 	cl1->addUser(*user2);
+	//create cloudlet2
+	cloudlet* cl2 = new cloudlet(1,5,4);
+	cl2->addUser(*user3);
+	cl2->addUser(*user4);
+
 	int next1 = nextService1(*cl1, numServices, storageCosts);		
 	cout << next1 << endl;
 	int next = nextService2(*cl1, numServices, storageCosts);		
