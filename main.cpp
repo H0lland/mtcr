@@ -8,8 +8,8 @@ bool servible(int pos, user U, cloudlet cl){
 	//initializations
 	bool servible = 1;
 	bool local = 0;
-	task* tas = U.getTasks().at(pos);
-	int serv = tas->getType();
+	task tas = U.getTasks().at(pos);
+	int serv = tas.getType();
 	int key = U.getKey();
 	vector<user> users = cl.getUsers();
 	//see if user is connected to cloudlet	
@@ -17,8 +17,15 @@ bool servible(int pos, user U, cloudlet cl){
 		if(key == users.at(i).getKey())
 			local = 1;
 	}
-	if(local){
-		
+	if(tas.getComp() > cl.getRemProcs()){ //task requires more processing than cloudlet has
+		servible = 0;
+	}
+
+	if(not local && servible){ //if not local and still servible check
+		//task requires more band than cloudlet has
+		if(tas.getIn() + tas.getOut() > cl.getRemBand()){ 
+			servible = 0;
+		}
 	}
 	return servible;
 }
@@ -139,41 +146,24 @@ int main(){
 	int numCloudlets = 2;
 	int numServices = 5;
 	int storageCosts [5] = {1,1,1,1,1};	
-	//base parameters for a task of type service 1
-	int serv1In = 1;
-	int serv1Out = 0;
-	int serv1Comp = 1;
-	//base parameters for a task of type service 2	
-	int serv2In = 1;
-	int serv2Out = 0;
-	int serv2Comp = 1;
-	//base parameters for a task of type service 3
-	int serv3In = 1;
-	int serv3Out = 0;
-	int serv3Comp = 1;
-	//base parameters for a task of type service 4
-	int serv4In = 1;
-	int serv4Out = 0;
-	int serv4Comp = 1;
-	//base parameters for a task of type service 5
-	int serv5In = 1;
-	int serv5Out = 0;
-	int serv5Comp = 1;
-
+	int inSize[5] = {1,1,1,1,1};
+	int outSize[5] = {0,0,0,0,0};
+	int compTimes[5] = {1,1,1,1,1};
+	
 	//create tasks of service 1
-	task* task1 = new task(serv1In, serv1Out, serv1Comp, 0);
-	task* task7 = new task(serv1In, serv1Out, serv1Comp, 0);	
+	task* task1 = new task(inSize[0],outSize[0],compTimes[0],0);	
+	task* task7 = new task(inSize[0],outSize[0],compTimes[0],0);
 	//create tasks of service 2
-	task* task4 = new task(serv2In, serv2Out, serv2Comp, 1);
+	task* task4 = new task(inSize[1],outSize[1],compTimes[1],1);
 	//create tasks of service 3
-	task* task3 = new task(serv3In, serv3Out, serv3Comp, 2);	
-	task* task5 = new task(serv3In, serv3Out, serv3Comp, 2);
-	task* task6 = new task(serv3In, serv3Out, serv3Comp, 2);
+	task* task3 = new task(inSize[2],outSize[2],compTimes[2],2);	
+	task* task5 = new task(inSize[2],outSize[2],compTimes[2],2);
+	task* task6 = new task(inSize[2],outSize[2],compTimes[2],2);
 	//create tasks of service 4
-	task* task8 = new task(serv4In, serv4Out, serv4Comp, 3);
-	task* task9 = new task(serv4In, serv4Out, serv4Comp, 3);
+	task* task8 = new task(inSize[3],outSize[3],compTimes[3],3);
+	task* task9 = new task(inSize[3],outSize[3],compTimes[3],3);
 	//create tasks of service 5
-	task* task2 = new task(serv5In, serv5Out, serv5Comp, 4);
+	task* task2 = new task(inSize[4],outSize[4],compTimes[4],4);
 
 	//create user1
 	user* user1 = new user(1);
