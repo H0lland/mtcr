@@ -25,7 +25,31 @@ def main(cloudlets,users,tasks):
     conns.sort()
     print(conns)
     
-    minDist = 1
-    maxDist = 10
+    minLocalDist = 1
+    maxLocalDist = 10
+    maxGlobalDist = 100
+    minCloudDist = 50
     
+    dists = []
+    #for each cloudlet
+    for i in range(cloudlets):
+        tmp = []
+        #for each user
+        for j in range(len(conns)):
+            #check if user j connected to cloudlet i
+            if conns[j] == i:
+                elem = randrange(minLocalDist,maxLocalDist+1)
+            #cloudlet not connected to user
+            else:
+                elem = randrange(maxLocalDist+1, maxGlobalDist)
+            tmp.append(elem)
+        dists.append(tmp)
+    #get the distances from the user to the cloud
+    tmp = []
+    for i in range(len(conns)):
+        elem = randrange(minCloudDist, maxGlobalDist)
+        tmp.append(elem)
+    dists.append(tmp)
+
+    print(dists)
 main(4,10,20)
