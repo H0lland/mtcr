@@ -7,7 +7,6 @@ def main(cloudlets,users,tasks):
     cl = 0
     #while there are unassigned users
     while unassigned > 0:
-        print(unassigned)
         #randomly select number to connect to current cloudlet
         if maxUsers <= unassigned:
             connUs = randrange(1,maxUsers)
@@ -23,8 +22,11 @@ def main(cloudlets,users,tasks):
             cl = 0
         unassigned -= connUs
     conns.sort()
-    print(conns)
     
+    print("conns:")
+    print(conns)
+
+    #set Dist variables
     minLocalDist = 1
     maxLocalDist = 10
     maxGlobalDist = 100
@@ -50,6 +52,35 @@ def main(cloudlets,users,tasks):
         elem = randrange(minCloudDist, maxGlobalDist)
         tmp.append(elem)
     dists.append(tmp)
+    print("dists:")
+    for i in range(len(dists)):
+        print(dists[i])
 
-    print(dists)
+    #set service variables
+    inSizes = [2,3,4,3,2]
+    outSizes = [1,1,1,0,0]
+    compTimes = [1,1,1,1,1]
+    #the number of occurrences out of 1000 for the most common service 
+    zipfBases = [437,656,801,911,1000]
+
+    tasks = []
+    for i in range(len(conns)):
+        #2 tasks for user
+        for j in range(2):
+            tmp = []
+            tmp.append(i)
+            serv = randrange(1,1001)
+            servType = -1
+            #determine where in the zipf distribution the thing fell
+            for k in range(len(zipfBases)):
+                if serv <= zipfBases[k] and servType == -1:
+                    servType = k
+            tmp.append(inSizes[servType])
+            tmp.append(outSizes[servType])
+            tmp.append(compTimes[servType])
+            tmp.append(servType)
+            tasks.append(tmp)
+    print("tasks:")
+    for i in range(len(tasks)):
+        print(tasks[i])
 main(4,10,20)
