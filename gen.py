@@ -1,5 +1,5 @@
 from random import randrange
-def main(cloudlets,users,tasks):
+def main(cloudlets,users,tasks, out):
     minUsers = 1
     maxUsers = 4 * minUsers
     unassigned = users
@@ -83,4 +83,19 @@ def main(cloudlets,users,tasks):
     print("tasks:")
     for i in range(len(tasks)):
         print(tasks[i])
-main(4,10,20)
+    #open file for output
+    file = open(out+".txt","w")
+    #write output to file
+    for i in range(len(conns)):
+        file.write(str(conns[i]) + ",")
+    file.write("\n")
+    for i in range(len(dists)):
+        for j in range(len(dists[i])):
+            file.write(str(dists[i][j]) + ",")
+        file.write("\n")
+    for i in range(len(tasks)):
+        for j in range(len(tasks[i])):
+            file.write(str(tasks[i][j])+",")
+        file.write("\n")
+    file.close()
+main(4,10,20,"out")
