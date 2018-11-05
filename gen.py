@@ -92,10 +92,11 @@ def main(cloudlets,users,tasks, out):
     for i in range(len(dists)):
         for j in range(len(dists[i])):
             file.write(str(dists[i][j]) + ",")
-        file.write("\n")
+        file.write(";")
+    file.write("\n")
     for i in range(len(tasks)):
         for j in range(len(tasks[i])):
             file.write(str(tasks[i][j])+",")
-        file.write("\n")
+        file.write(";")
     file.close()
 main(4,10,20,"out")
