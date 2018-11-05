@@ -15,9 +15,6 @@ for i in range(len(tasks)):
     tasks[i] = tasks[i][:-1].split(",")
     tasks[i] = list(map(int,tasks[i]))
 storageCosts = [1,1,1,1,1]
-inSize = [1,1,1,1,1]
-outSize = [0,0,0,0,0]
-compTimes = [1,1,1,1,1]
 cloudletStorage = [2,1]
 cloudletBand = [5,5]
 cloudletProcs = [4,4]
