@@ -34,7 +34,7 @@ def main(cloudlets,users,tasks, out):
 	for i in range(cloudlets):
 		tmp = []
 		#for each user
-		for j in range(len(conns)):
+		for j in range(users):
 			#check if user j connected to cloudlet i
 			if conns[j] == i:
 				elem = randrange(minLocalDist,maxLocalDist+1)
@@ -45,7 +45,7 @@ def main(cloudlets,users,tasks, out):
 		dists.append(tmp)
 	#get the distances from the user to the cloud
 	tmp = []
-	for i in range(len(conns)):
+	for i in range(users):
 		elem = randrange(minCloudDist, maxGlobalDist)
 		tmp.append(elem)
 	dists.append(tmp)
@@ -57,7 +57,7 @@ def main(cloudlets,users,tasks, out):
 	#the number of occurrences out of 1000 for the most common service 
 	zipfBases = [437,656,801,911,1000]
 	tasks = []
-	for i in range(len(conns)):
+	for i in range(users):
 		#2 tasks for user
 		for j in range(2):
 			tmp = []
@@ -90,7 +90,19 @@ def main(cloudlets,users,tasks, out):
 		band = minBand+round((maxBand-minBand)*scale)
 		procs = minProcs+round((maxProcs-minProcs)*scale)
 		specs.append([stor,band,procs])
-
+		
+        #set variables for QoS construction
+	qos = []
+	#make a row for each user
+	for i in range(users):
+		tmp = []
+		for j in range(len(tasks)):
+			#if task is assigned to user i
+			if tasks[j][0] == i:
+				#append thrice the computation time for qos
+				tmp.append(3*tasks[j][3])
+		qos.append(tmp)
+	print(qos)        
 	#open file for output
 	file = open(out+".txt","w")
 	#write output to file
@@ -104,6 +116,12 @@ def main(cloudlets,users,tasks, out):
 	for i in range(len(conns)):
 		file.write(str(conns[i]) + ",")
 	file.write("\n")
+	#write qos
+	for i in range(len(qos)):
+		for j in range(len(qos[i])):
+			file.write(str(qos[i][j])+",")
+		file.write(";")
+	file.write("\n")
 	#write dists
 	for i in range(len(dists)):
 		for j in range(len(dists[i])):
@@ -115,5 +133,6 @@ def main(cloudlets,users,tasks, out):
 		for j in range(len(tasks[i])):
 			file.write(str(tasks[i][j])+",")
 		file.write(";")
+	file.write("\n")
 	file.close()
 main(4,10,20,"out")
