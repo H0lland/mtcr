@@ -43,9 +43,23 @@ schedulingCosts = [1,1,1,1,1]
 #create the model
 model = Model('MTCR Optimization')
 #create placement matrix
-placing = model.addVars(services-1,len(dists))
+placing = model.addVars(services,len(dists))
+print(placing.keys())
+print(placing[0,0])
+
 #create scheduling matrix
 schedule = model.addVars(len(tasks)-1,len(dists))
 #include cloudlet spec constraints
-model.addConstrs(quicksum(storageCosts[m]*placing[m,j] for m in range(0,len(storageCosts))) <= specs[j][0] for j in range(0,len(specs)))
-#model.addConstrs(quicksum(tasks[t][3
+#storage
+model.addConstrs(quicksum((storageCosts[m]*placing[m,j]) for m in range(0,len(storageCosts))) <= ((specs[j][0]) for j in range(0,len(specs))),"Storage")
+#processing
+model.addConstrs(quicksum((tasks[t][3] * schedule[t][j]) for t in range(0,len(tasks))) <= ((specs[j][1]) for j in range(0,len(specs))),"Processing")
+#bandwidth
+#model.addConstrs(quicksum(tasks[t][]))
+
+#Completion constraints
+model.addConstrs(quicksum(schedule) == len(tasks),"All tasks completed")
+model.addConstrs((quicksum(schedule[t]) == 1) for t in range(0,len(tasks))),"Uniqueness")
+
+#Time constraints
+#model.addConstrs(quicksum(schedule[t][j]*delt[t][j] for j in range (0,len(
