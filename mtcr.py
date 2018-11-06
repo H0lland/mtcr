@@ -43,23 +43,43 @@ schedulingCosts = [1,1,1,1,1]
 #create the model
 model = Model('MTCR Optimization')
 #create placement matrix
-placing = model.addVars(services,len(dists))
-print(placing.keys())
-print(placing[0,0])
+placing = model.addVars(services,len(dists),vtype = GRB.BINARY)
 
 #create scheduling matrix
-schedule = model.addVars(len(tasks)-1,len(dists))
+schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY)
 #include cloudlet spec constraints
 #storage
-model.addConstrs(quicksum((storageCosts[m]*placing[m,j]) for m in range(0,len(storageCosts))) <= ((specs[j][0]) for j in range(0,len(specs))),"Storage")
+for j in range(0,len(specs)):
+	sumM = 0
+	for m in range(0,len(storageCosts)):
+		sumM += storageCosts[m]*placing[m,j]
+	model.addConstr(sumM <= specs[j][0],"Storage" + str(j))
+#model.addConstrs(for j in range(0,len(specs):for m in range(0,len(storageCosts)):quicksum(storageCosts[m]*placing[m,j]) <= specs[j][0] ,"Storage")
 #processing
-model.addConstrs(quicksum((tasks[t][3] * schedule[t][j]) for t in range(0,len(tasks))) <= ((specs[j][1]) for j in range(0,len(specs))),"Processing")
+for j in range(0,len(specs)):
+	sumT = 0
+	for t in range(0,len(tasks)):
+		sumT += tasks[t][3]*schedule[t,j]
+	model.addConstr(sumT <= specs[j][1],"Processing" + str(j))
+
+#Completion constraints
+model.addConstr(schedule.sum() == len(tasks),"All tasks")
+
+for t in range(0,len(tasks)):
+	sumCom = 0
+	for j in range(0,len(specs)):
+		sumCom += schedule[t,j]
+	model.addConstr(sumCom == 1, "Uniqueness")
+
+#objective function
+obj = quicksum(quicksum(placementCost[m]
+'''model.addConstrs(quicksum((tasks[t][3] * schedule[t][j] for t in range(0,len(tasks))) <= specs[j][1]) for j in range(0,len(specs)),"Processing")
 #bandwidth
 #model.addConstrs(quicksum(tasks[t][]))
 
 #Completion constraints
 model.addConstrs(quicksum(schedule) == len(tasks),"All tasks completed")
-model.addConstrs((quicksum(schedule[t]) == 1) for t in range(0,len(tasks))),"Uniqueness")
+model.addConstrs(((quicksum(schedule[t]) == 1) for t in range(0,len(tasks))),"Uniqueness")
 
 #Time constraints
-#model.addConstrs(quicksum(schedule[t][j]*delt[t][j] for j in range (0,len(
+#model.addConstrs(quicksum(schedule[t][j]*delt[t][j] for j in range (0,len('''
