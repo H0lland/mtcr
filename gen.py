@@ -1,4 +1,6 @@
+#!/usr/bin/env python3.7
 from random import randrange,random
+
 def main(cloudlets,users,tasks, out):
 	#set variables for constructing conns
 	minUsers = 1
@@ -90,8 +92,8 @@ def main(cloudlets,users,tasks, out):
 		band = minBand+round((maxBand-minBand)*scale)
 		procs = minProcs+round((maxProcs-minProcs)*scale)
 		specs.append([stor,band,procs])
-		
-        #set variables for QoS construction
+	
+	#set variables for QoS construction
 	qos = []
 	#make a row for each user
 	for i in range(users):
@@ -102,7 +104,8 @@ def main(cloudlets,users,tasks, out):
 				#append thrice the computation time for qos
 				tmp.append(3*tasks[j][3])
 		qos.append(tmp)
-	print(qos)        
+	print(qos)
+
 	#open file for output
 	file = open(out+".txt","w")
 	#write output to file

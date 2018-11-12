@@ -47,14 +47,15 @@ placing = model.addVars(services,len(dists),vtype = GRB.BINARY)
 
 #create scheduling matrix
 schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY)
-#include cloudlet spec constraints
+
+#cloudlet spec constraints
 #storage
 for j in range(0,len(specs)):
 	sumM = 0
 	for m in range(0,len(storageCosts)):
 		sumM += storageCosts[m]*placing[m,j]
 	model.addConstr(sumM <= specs[j][0],"Storage" + str(j))
-#model.addConstrs(for j in range(0,len(specs):for m in range(0,len(storageCosts)):quicksum(storageCosts[m]*placing[m,j]) <= specs[j][0] ,"Storage")
+
 #processing
 for j in range(0,len(specs)):
 	sumT = 0
@@ -71,22 +72,33 @@ for t in range(0,len(tasks)):
 		sumCom += schedule[t,j]
 	model.addConstr(sumCom == 1, "Uniqueness")
 
+#service existance constraint
+for j in range(0,len(specs)):
+	for t in range(0,len(tasks)):
+		ty = tasks[t][4]
+		model.addConstr(schedule[t,j] <= placing[ty,j],"Service Existance")
+
 #objective function
-GRBLinExpr obj = 0.0
+obj = model.getObjective() 
 
 
+#add placement terms
 for m in range(services):
     for j in range(0,len(specs)):
-        obj.addTerm(placementCosts[m],placing[m,j])
+        obj.add(placing[m,j],placementCosts[m])
 
+#add scheduling terms
 for j in range(0,len(specs)):
     for t in range(0,len(tasks)):
         ty = tasks[t][4]
-        obj.addTerm(schedulingCosts[ty],schedule[t,j])
+        obj.add(schedule[t,j],schedulingCosts[ty])
 
-model.setObjective(obj, GRB_MINIMIZE)
+#set objective and optimize
+model.setObjective(obj, GRB.MINIMIZE)
 model.optimize()
+
+#print variables
 for v in model.getVars():
-    if v!= 0:
-        print(v.Varname, v.X)
+		if v.X != 0:
+			print(v.Varname, v.X)
 model.write("mtcr.sol")
