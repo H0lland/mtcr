@@ -1,6 +1,8 @@
 #include<iostream>
 #include "objs/cloudlet.h"
 #include<vector>
+#include<string.h>
+#include<fstream>
 using namespace std;
 
 //Servible: determine if a task is servible by a cloudlet (assuming the proper service is placed on that cloudlet
@@ -140,7 +142,58 @@ std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
 	return rtn;
 }
 
-int main(){
+//takes in a string and splits it into a 2D array of ints
+vector<vector<int>> arrayify(string line){
+	vector<vector<int>> rtn;
+	vector<int> temp;
+	string str = "";
+	int i = 0;
+	//while you haven't traversed the string
+	while(i < line.length()){
+		//if you encounter a line break, add temp to rtn, clear vars
+		if(line.at(i) == ';'){
+			rtn.push_back(temp);
+			temp.clear();
+			str = "";
+		}
+		else{
+			//if you encounter a num break, add num to temp, clear vars
+			if(line.at(i) == ','){
+				temp.push_back(std::stoi(str));
+				str = "";
+			}
+			//else, add digit to num
+			else{
+				str += line.at(i);
+			}
+		}
+		i += 1;
+	}
+	return rtn;
+}
+
+int main(int argc, char** argv){
+	//check for correct usage
+	if(argc < 2) {
+		cout << "Incorrect usage!" <<endl;
+		cout << "usage: ./main.cpp inFile" <<endl;
+		return 0;
+	}
+	//initialize stuff for inFile parsing
+	vector<string> lines;
+	string line;
+	ifstream myFile (argv[1]);
+	//getlines
+	if(myFile.is_open()){
+		while(getline(myFile, line)){
+		lines.push_back(line);
+		}
+	}
+	vector<vector<int>> qos = arrayify(lines[2]);
+	int three = qos.at(0).at(0);
+	cout<< three << endl;
+
+	//initialization 
 	cout << "Hello" << endl;
 	int numUsers = 4;
 	int numCloudlets = 2;
@@ -163,8 +216,7 @@ int main(){
 	task* task8 = new task(inSize[3],outSize[3],compTimes[3],3);
 	task* task9 = new task(inSize[3],outSize[3],compTimes[3],3);
 	//create tasks of service 5
-	task* task2 = new task(inSize[4],outSize[4],compTimes[4],4);
-
+	task* task2 = new task(inSize[4],outSize[4],compTimes[4],4);	
 	//create user1
 	user* user1 = new user(1);
 	user1->addTask(*task1);
