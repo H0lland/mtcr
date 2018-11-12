@@ -72,14 +72,21 @@ for t in range(0,len(tasks)):
 	model.addConstr(sumCom == 1, "Uniqueness")
 
 #objective function
-obj = quicksum(quicksum(placementCost[m]
-'''model.addConstrs(quicksum((tasks[t][3] * schedule[t][j] for t in range(0,len(tasks))) <= specs[j][1]) for j in range(0,len(specs)),"Processing")
-#bandwidth
-#model.addConstrs(quicksum(tasks[t][]))
+GRBLinExpr obj = 0.0
 
-#Completion constraints
-model.addConstrs(quicksum(schedule) == len(tasks),"All tasks completed")
-model.addConstrs(((quicksum(schedule[t]) == 1) for t in range(0,len(tasks))),"Uniqueness")
 
-#Time constraints
-#model.addConstrs(quicksum(schedule[t][j]*delt[t][j] for j in range (0,len('''
+for m in range(services):
+    for j in range(0,len(specs)):
+        obj.addTerm(placementCosts[m],placing[m,j])
+
+for j in range(0,len(specs)):
+    for t in range(0,len(tasks)):
+        ty = tasks[t][4]
+        obj.addTerm(schedulingCosts[ty],schedule[t,j])
+
+model.setObjective(obj, GRB_MINIMIZE)
+model.optimize()
+for v in model.getVars():
+    if v!= 0:
+        print(v.Varname, v.X)
+model.write("mtcr.sol")
