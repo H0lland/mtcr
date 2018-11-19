@@ -3,7 +3,8 @@ from gurobipy import *
 
 #Data
 #read in from scenario file
-file = open("out.txt","r")
+inFile = input("input location: ")
+file = open(inFile,"r")
 lines = file.readlines()
 
 #parse cloudlet specs
@@ -61,7 +62,7 @@ for j in range(0,len(specs)):
 	sumT = 0
 	for t in range(0,len(tasks)):
 		sumT += tasks[t][3]*schedule[t,j]
-	model.addConstr(sumT <= specs[j][1],"Processing" + str(j))
+	model.addConstr(sumT <= specs[j][2],"Processing" + str(j))
 
 #Completion constraints
 model.addConstr(schedule.sum() == len(tasks),"All tasks")
@@ -113,4 +114,5 @@ model.optimize()
 for v in model.getVars():
 		if v.X != 0:
 			print(v.Varname, v.X)
-model.write("mtcr.sol")
+fName = inFile.split('.')[0]
+model.write(fName + ".sol")

@@ -1,7 +1,11 @@
 #!/usr/bin/env python3.7
 from random import randrange,random
 
-def main(cloudlets,users,tasks, out):
+def main():
+	cloudlets = int(input("# Cloudlets: "))
+	users = int(input("# Users: "))
+	tasks = 2 * users 
+	out = input("Outname: ")
 	#set variables for constructing conns
 	minUsers = 1
 	maxUsers = 4 * minUsers
@@ -27,10 +31,10 @@ def main(cloudlets,users,tasks, out):
 	conns.sort()
 
 	#set variables for dists construction
-	minLocalDist = 1
-	maxLocalDist = 10
-	maxGlobalDist = 100
-	minCloudDist = 50
+	minLocalDist = 10
+	maxLocalDist = 100
+	maxGlobalDist = 500
+	minCloudDist = 250
 	dists = []
 	#for each cloudlet
 	for i in range(cloudlets):
@@ -53,8 +57,8 @@ def main(cloudlets,users,tasks, out):
 	dists.append(tmp)
 
 	#set service variables for tasks construction
-	inSizes = [2,3,4,3,2]
-	outSizes = [1,1,1,0,0]
+	inSizes = [20,30,40,30,20]
+	outSizes = [9,11,15,10,8]
 	compTimes = [1,1,1,1,1]
 	#the number of occurrences out of 1000 for the most common service 
 	zipfBases = [437,656,801,911,1000]
@@ -104,8 +108,7 @@ def main(cloudlets,users,tasks, out):
 			if tasks[j][0] == i:
 				#append thrice the computation time for qos
 				tmp.append(3*tasks[j][3])
-		qos.append(tmp)
-	print(qos)
+		qos.append(tmp)	
 
 	#open file for output
 	file = open(out+".txt","w")
@@ -139,4 +142,4 @@ def main(cloudlets,users,tasks, out):
 		file.write(";")
 	file.write("\n")
 	file.close()
-main(4,10,20,"out")
+main()
