@@ -111,7 +111,7 @@ def main():
 		qos.append(tmp)	
 
 	#open file for output
-	file = open(out+".txt","w")
+	file = open(out+".gcon","w")
 	#write output to file
 	#write specs
 	for i in range(len(specs)):

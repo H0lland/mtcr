@@ -3,8 +3,8 @@ from gurobipy import *
 
 #Data
 #read in from scenario file
-inFile = input("input location: ")
-file = open(inFile,"r")
+inFile = input("Config name: ")
+file = open(inFile+".gcon","r")
 lines = file.readlines()
 
 #parse cloudlet specs
