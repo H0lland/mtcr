@@ -43,10 +43,10 @@ schedulingCosts = [1,1,1,1,1]
 #create the model
 model = Model('MTCR Optimization')
 #create placement matrix
-placing = model.addVars(services,len(dists),vtype = GRB.BINARY)
+placing = model.addVars(services,len(dists),vtype = GRB.BINARY, name = "placing")
 
 #create scheduling matrix
-schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY)
+schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY, name = "scheduling")
 
 #cloudlet spec constraints
 #storage
@@ -77,6 +77,18 @@ for j in range(0,len(specs)):
 	for t in range(0,len(tasks)):
 		ty = tasks[t][4]
 		model.addConstr(schedule[t,j] <= placing[ty,j],"Service Existance")
+
+#qos constraints
+for t in range(0,len(tasks)):
+		user = tasks[t][0]
+		taskNum = t % 2
+		#for each cloudlet
+		for k in range(0,len(specs)):
+			upTime = .0001 * tasks[t][1] * dists[k][user]
+			downTime = .0001 * tasks[t][2] * dists[k][user]
+			procTime = tasks[t][3]
+			tot = upTime + float(procTime) + downTime
+			model.addConstr(tot*schedule[t,j] <= qos[user][taskNum], "QoS Constraint")
 
 #objective function
 obj = model.getObjective() 

@@ -92,7 +92,8 @@ def main(cloudlets,users,tasks, out):
 		band = minBand+round((maxBand-minBand)*scale)
 		procs = minProcs+round((maxProcs-minProcs)*scale)
 		specs.append([stor,band,procs])
-	
+	specs.append([10000,10000,10000])	
+
 	#set variables for QoS construction
 	qos = []
 	#make a row for each user
