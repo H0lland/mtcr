@@ -112,8 +112,8 @@ model.setObjective(obj, GRB.MINIMIZE)
 model.optimize()
 
 #print variables
-for v in model.getVars():
+'''for v in model.getVars():
 		if v.X != 0:
-			print(v.Varname, v.X)
+			print(v.Varname, v.X)'''
 fName = inFile.split('.')[0]
 model.write(fName + ".sol")
