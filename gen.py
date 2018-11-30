@@ -1,11 +1,14 @@
 #!/usr/bin/env python3.7
 from random import randrange,random
-
+import sys
 def main():
-	cloudlets = int(input("# Cloudlets: "))
-	users = int(input("# Users: "))
+	#cloudlets = int(input("# Cloudlets: "))
+	#users = int(input("# Users: "))
+	cloudlets = int(sys.argv[1])
+	users = int(sys.argv[2])
 	tasks = 2 * users 
-	out = input("Outname: ")
+	out = sys.argv[3]
+	#out = input("Outname: ")
 	#set variables for constructing conns
 	minUsers = 1
 	maxUsers = 4 * minUsers

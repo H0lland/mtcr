@@ -1,9 +1,10 @@
 #!/usr/bin/env python3.7
 from gurobipy import *
-
+import sys
 #Data
 #read in from scenario file
-inFile = input("Config name: ")
+#inFile = input("Config name: ")
+inFile = sys.argv[1]
 file = open(inFile+".gcon","r")
 lines = file.readlines()
 
