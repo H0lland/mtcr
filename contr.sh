@@ -18,4 +18,3 @@ until [ $num -gt $2 ]; do
 	done
 	let num+=$step
 done
-

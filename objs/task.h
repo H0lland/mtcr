@@ -1,11 +1,13 @@
+#include "service.h"
 class task {
 	private: 
-		int inSize, outSize, compTime, type;	
-
+		int inSize, outSize, compTime;	
+		service type;
 	public:
-	task(int in, int out, int comp, int serv);
+	task(int in, int out, int comp);
 	int getIn();
 	int getOut();
 	int getComp();
-	int getType();
+	service getType();
+	void setType(service serv);
 };

@@ -34,13 +34,42 @@ vector<vector<vector<int>>> parseIn(string filename){
 	}
 	return rtn;
 }
+
+//makeCloudlets:  Takes the listed cloudlet parameters from the input file and returns a vector of cloudlets.
+vector<cloudlet> makeCloudlets(vector<vector<int>> params){
+	//initializations
+	vector<cloudlet> rtn;
+	for(int i = 0; i< params.size(); i+=1){
+		vector<int> curr = params.at(i);
+		//create cloudlet
+		cloudlet c(curr.at(0),curr.at(1),curr.at(2));
+		cout << c.getStor();
+		rtn.push_back(c);
+	}
+	return rtn;
+}
+
+//makeTasks: Takes the listed task parameters from the input file and returns a vector of tasks.
+vector<task> makeTasks(vector<vector<int>> params, vector<service> servs){
+	//initializations
+	vector<task> rtn;
+	//for each task
+	for(int i=0; i< params.size(); i+=1){
+		vector<int> curr = params.at(i);
+		//create task
+		task t(curr.at(1),curr.at(2),curr.at(3));
+		rtn.push_back(t);	
+	}
+	return rtn;
+}
+
 //Servible: determine if a task is servible by a cloudlet (assuming the proper service is placed on that cloudlet
 bool servible(int pos, user U, cloudlet cl){
 	//initializations
 	bool servible = 1;
 	bool local = 0;
 	task tas = U.getTasks().at(pos);
-	int serv = tas.getType();
+	service serv = tas.getType();
 	int key = U.getKey();
 	vector<user> users = cl.getUsers();
 	//see if user is connected to cloudlet	
@@ -59,6 +88,7 @@ bool servible(int pos, user U, cloudlet cl){
 	}
 	return servible;
 }
+/*
 //Greedy Local Algorithm 1: pick tasks by tasks/storage metric
 int nextService1(cloudlet cl, int numSer, int stor[]){
 	int buckets[numSer];
@@ -73,7 +103,7 @@ int nextService1(cloudlet cl, int numSer, int stor[]){
 	for(int j = 0; j < users.size(); j++){
 		vector<task> tasks = users.at(j).getTasks();
 		for(int k = 0; k < tasks.size(); k++){
-			int serv = tasks.at(k).getType();
+			service serv = tasks.at(k).getType();
 			buckets[serv-1]++;
 		}
 	}
@@ -169,7 +199,7 @@ std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
 	}
 	return rtn;
 }
-
+*/
 //takes in a string and splits it into a 2D array of ints
 vector<vector<int>> arrayify(string line){
 	vector<vector<int>> rtn;
@@ -301,4 +331,5 @@ int main(int argc, char** argv){
 		}
 		cout << '\n';
 	}
+	vector<cloudlet> cls = makeCloudlets(in.at(0));
 }

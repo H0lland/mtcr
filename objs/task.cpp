@@ -1,10 +1,9 @@
 #include "task.h"
 
-task::task(int in, int out, int comp, int serv){
+task::task(int in, int out, int comp){
 	inSize = in;
 	outSize = out;
 	compTime = comp;
-	type = serv;
 }
 
 int task::getIn(){
@@ -19,6 +18,10 @@ int task::getComp(){
 	return compTime;
 }
 
-int task::getType(){
+service task::getType(){
 	return type;
+}
+
+void task::setType(service serv){
+	type = serv;
 }
