@@ -39,8 +39,8 @@ for i in range(len(tasks)):
 #other constants
 services = 5
 storageCosts = [1,1,1,1,1]
-placementCosts = [1,1,1,1,1]
-schedulingCosts = [1,1,1,1,1]
+placementCosts = [3,2,1,2,1]
+schedulingCosts = [1,2,3,1,3]
 
 #create the model
 model = Model('MTCR Optimization')
