@@ -3,8 +3,30 @@
 #include<vector>
 #include<string.h>
 #include<fstream>
+#include<iostream>
+#include<sstream>
 using namespace std;
 
+//ParseIn: Parses input file (must be of type .gcon) and returns the content in a 2-D vector
+vector<vector<string>> parseIn(string filename){
+	//initializations
+	ifstream readfile(filename);
+	vector<vector<string>> rtn;
+	string line;
+	string tmpStr;
+	//for each line in the file
+	while(getline(readfile,line)){
+		//initializations
+		vector<string> temp;
+		stringstream iss(line,ios_base::in);
+		//for each subline
+		while(getline(iss,tmpStr,';')){
+			temp.push_back(tmpStr);
+		}
+		rtn.push_back(temp);
+	}
+	return rtn;
+}
 //Servible: determine if a task is servible by a cloudlet (assuming the proper service is placed on that cloudlet
 bool servible(int pos, user U, cloudlet cl){
 	//initializations
@@ -22,7 +44,6 @@ bool servible(int pos, user U, cloudlet cl){
 	if(tas.getComp() > cl.getRemProcs()){ //task requires more processing than cloudlet has
 		servible = 0;
 	}
-
 	if(not local && servible){ //if not local and still servible check
 		//task requires more band than cloudlet has
 		if(tas.getIn() + tas.getOut() > cl.getRemBand()){ 
