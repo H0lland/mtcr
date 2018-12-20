@@ -8,22 +8,29 @@
 using namespace std;
 
 //ParseIn: Parses input file (must be of type .gcon) and returns the content in a 2-D vector
-vector<vector<string>> parseIn(string filename){
+vector<vector<vector<int>>> parseIn(string filename){
 	//initializations
 	ifstream readfile(filename);
-	vector<vector<string>> rtn;
+	vector<vector<vector<int>>> rtn;
+	string section;
 	string line;
-	string tmpStr;
+	string item;
 	//for each line in the file
-	while(getline(readfile,line)){
+	while(getline(readfile,section)){
 		//initializations
-		vector<string> temp;
-		stringstream iss(line,ios_base::in);
+		vector<vector<int>> tmpSec;
+		stringstream iss(section,ios_base::in);
 		//for each subline
-		while(getline(iss,tmpStr,';')){
-			temp.push_back(tmpStr);
+		while(getline(iss,line,';')){
+			vector<int> tmpLine;
+			stringstream iss2(line,ios_base::in);
+			//for each item in the subline
+			while(getline(iss2,item,',')){
+				tmpLine.push_back(std::stoi(item));
+			}
+			tmpSec.push_back(tmpLine);
 		}
-		rtn.push_back(temp);
+		rtn.push_back(tmpSec);
 	}
 	return rtn;
 }
@@ -192,7 +199,7 @@ vector<vector<int>> arrayify(string line){
 	}
 	return rtn;
 }
-
+/*
 int main(int argc, char** argv){
 	//check for correct usage
 	if(argc < 2) {
@@ -278,4 +285,20 @@ int main(int argc, char** argv){
 	cout << next1 << endl;
 	int next = nextService2(*cl1, numServices, storageCosts);		
 	cout << next << endl;
+}*/
+
+int main(int argc, char** argv){
+	cout << "Enter filename: " << endl;
+	string fn;
+	cin >> fn;
+	vector<vector<vector<int>>> in = parseIn(fn);
+	for(int i=0; i< in.size(); i+=1){
+		for(int j = 0; j < in.at(i).size(); j+=1){
+			for(int k = 0; k< in.at(i).at(j).size(); k+=1){
+				cout << in.at(i).at(j).at(k) << ',';
+			}
+			cout << '\t';
+		}
+		cout << '\n';
+	}
 }
