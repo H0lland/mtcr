@@ -2,13 +2,8 @@
 
 service::service(){}
 
-service::service(char* n, int k){
-	name = n;
+service::service(int k){
 	key = k;
-}
-
-char* service::getName(){
-	return name;
 }
 
 int service::getKey(){

@@ -78,7 +78,7 @@ void connect(vector<cloudlet> &cls, vector<user> users, vector<vector<int>> para
 }
 
 //makeTasks: Takes the listed task parameters from the input file and returns a vector of tasks.
-vector<task> makeTasks(vector<vector<int>> params){ //vector<service> servs){
+vector<task> makeTasks(vector<vector<int>> params, vector<service> servs){
 	//initializations
 	vector<task> rtn;
 	//for each task
@@ -86,6 +86,7 @@ vector<task> makeTasks(vector<vector<int>> params){ //vector<service> servs){
 		vector<int> curr = params.at(i);
 		//create task
 		task t(curr.at(1),curr.at(2),curr.at(3));
+		t.setType(servs.at(curr.at(4)));
 		rtn.push_back(t);	
 	}
 	return rtn;
@@ -359,10 +360,15 @@ int main(int argc, char** argv){
 		}
 		cout << '\n';
 	}
+	vector<service> servs;
+	servs.push_back(service(0));
+	servs.push_back(service(1));
+	servs.push_back(service(2));
+	servs.push_back(service(3));
+	servs.push_back(service(4));
 	vector<cloudlet> cls = makeCloudlets(in.at(0));
 	vector<vector<int>> dists = in.at(3);
-	vector<task> tasks = makeTasks(in.at(4));
+	vector<task> tasks = makeTasks(in.at(4),servs);
 	vector<user> users = makeUsers(in.at(2),tasks);
 	connect(cls,users,in.at(1));
-	cout << cls.at(0).getUsers().at(0).getTasks().at(0).getIn() << endl;
 }
