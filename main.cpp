@@ -361,11 +361,11 @@ int main(int argc, char** argv){
 		cout << '\n';
 	}
 	vector<service> servs;
-	servs.push_back(service(0));
-	servs.push_back(service(1));
-	servs.push_back(service(2));
-	servs.push_back(service(3));
-	servs.push_back(service(4));
+	servs.push_back(service(0,1,3,1));
+	servs.push_back(service(1,1,2,2));
+	servs.push_back(service(2,1,1,3));
+	servs.push_back(service(3,1,2,1));
+	servs.push_back(service(4,1,1,3));
 	vector<cloudlet> cls = makeCloudlets(in.at(0));
 	vector<vector<int>> dists = in.at(3);
 	vector<task> tasks = makeTasks(in.at(4),servs);
