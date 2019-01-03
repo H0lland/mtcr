@@ -71,7 +71,7 @@ vector<user> makeUsers(vector<vector<int>> qos, vector<task> tasks){
 //connect: connects the cloudlets to the users based on connection input
 void connect(vector<cloudlet> &cls, vector<user> users, vector<vector<int>> params){
 	//for each user
-	for(int i = 0; i < params.size(); i+=1){
+	for(int i = 0; i < params.at(0).size(); i+=1){
 		int cl = params.at(0).at(i);
 		cls.at(cl).addUser(users.at(i));
 	}
@@ -187,48 +187,75 @@ int nextService2(cloudlet cl, int numSer, int stor[]){
 	}
 	return (pos+1);
 }
+*/
+//maxElement: returns max int in a vector of ints excluding the last element
+int maxElement(vector<int> vec){
+	int max = 0;
+	for(int i = 1; i< vec.size() - 1; i++){
+		if(vec.at(i) > vec.at(max)){
+			max = i;
+		}
+	}	
+	return max;
+}
 
 //Greedy Global Algorithm 1: Select services based on number of tasks of a type of service across the entire system
-std::vector<int> selectServices1(vector<cloudlet> cls, int numSer, int stor[]){
-	int buckets[numSer];
+std::vector<int> selectServices1(vector<cloudlet> cls, vector<service> servs){
+	int numSer = servs.size();
+	vector<float> buckets;
 	//initialize buckets
 	for(int i = 0; i < numSer; i++){
-		buckets[i] = 0;
+		buckets.push_back(0);
 	}
-	int remain = 0; //variable to store total remaining storage
+	//variable to store total remaining storage
+	vector<int> remains;
+	int remain = 0;
 	for(int i = 0; i < cls.size(); i++){
-		vector<int> servs = cls.at(i).getServs();
+		vector<int> clServs = cls.at(i).getServs();
 		vector<user> users = cls.at(i).getUsers();
-		remain += cls.at(i).getRemStor();	
+		remains.push_back(cls.at(i).getRemStor());
+		remain += cls.at(i).getRemStor();
 		//count occurences for each service
 		for(int j = 0; j < users.size(); j++){
 			vector<task> tasks = users.at(j).getTasks();
 			for(int k = 0; k < tasks.size(); k++){
-				int serv = tasks.at(k).getType();
-				buckets[serv-1]++;
+				int serv = tasks.at(k).getType().getKey();
+				buckets.at(serv)+=1.0;
 				}
 		}
 	}
-	int i = 0;
 	vector<int> rtn;
+	bool placed = true;
+	int largest = maxElement(remains);
 	//make this take into account the storage restraint
-	while(i < 3){
+	while(remain > 0 && placed){	
+		placed = false;
 		float max = 0;
-		int pos = 0;
+		int pos = -1;
 		//pick the next service needed
 		for(int j = 0; j < numSer; j++){
-			float profit = buckets[j]/stor[j]; //determine profit as tasks over cost
-			if(profit > max){
+			float profit = buckets.at(j)/servs.at(j).getPlace(); //determine profit as tasks over cost
+			//find the maximum that fits and servs enough tasks to be worth it
+			if(profit > max && remains.at(largest) >= servs.at(j).getStor() && profit > 1){
 				max = profit;
 				pos = j;
 			}
 		}
-		rtn.push_back(pos+1);
-		i+=1;
+		//service could be placed
+		if(pos > -1){
+			//set flag
+			placed = true;
+			rtn.push_back(pos);	
+			//adjust values
+			buckets.at(pos)/=2;	
+			remain -= servs.at(pos).getStor();
+			remains.at(largest) -= servs.at(pos).getStor();
+			largest = maxElement(remains);
+		}
 	}
 	return rtn;
 }
-*/
+
 //takes in a string and splits it into a 2D array of ints
 vector<vector<int>> arrayify(string line){
 	vector<vector<int>> rtn;
@@ -258,94 +285,6 @@ vector<vector<int>> arrayify(string line){
 	}
 	return rtn;
 }
-/*
-int main(int argc, char** argv){
-	//check for correct usage
-	if(argc < 2) {
-		cout << "Incorrect usage!" <<endl;
-		cout << "usage: ./main.cpp inFile" <<endl;
-		return 0;
-	}
-	//initialize stuff for inFile parsing
-	vector<string> lines;
-	string line;
-	ifstream myFile (argv[1]);
-	//getlines
-	if(myFile.is_open()){
-		while(getline(myFile, line)){
-		lines.push_back(line);
-		}
-	}
-	vector<vector<int>> qos = arrayify(lines[2]);
-	int three = qos.at(0).at(0);
-	cout<< three << endl;
-
-	//initialization 
-	cout << "Hello" << endl;
-	int numUsers = 4;
-	int numCloudlets = 2;
-	int numServices = 5;
-	int storageCosts [5] = {1,1,1,1,1};	
-	int inSize[5] = {1,1,1,1,1};
-	int outSize[5] = {0,0,0,0,0};
-	int compTimes[5] = {1,1,1,1,1};
-	
-	//create tasks of service 1
-	task* task1 = new task(inSize[0],outSize[0],compTimes[0],0);	
-	task* task7 = new task(inSize[0],outSize[0],compTimes[0],0);
-	//create tasks of service 2
-	task* task4 = new task(inSize[1],outSize[1],compTimes[1],1);
-	//create tasks of service 3
-	task* task3 = new task(inSize[2],outSize[2],compTimes[2],2);	
-	task* task5 = new task(inSize[2],outSize[2],compTimes[2],2);
-	task* task6 = new task(inSize[2],outSize[2],compTimes[2],2);
-	//create tasks of service 4
-	task* task8 = new task(inSize[3],outSize[3],compTimes[3],3);
-	task* task9 = new task(inSize[3],outSize[3],compTimes[3],3);
-	//create tasks of service 5
-	task* task2 = new task(inSize[4],outSize[4],compTimes[4],4);	
-	//create user1
-	user* user1 = new user(1);
-	user1->addTask(*task1);
-	user1->addQos(0);
-	user1->addTask(*task2);
-	user1->addQos(0);
-	//create user2
-	user*user2 = new user(2);
-	user2->addTask(*task3);
-	user2->addQos(0);
-	user2->addTask(*task4);
-	user2->addQos(0);
-	//create user3
-	user* user3 = new user(3);
-	user3->addTask(*task5);
-	user3->addQos(0);
-	user3->addTask(*task6);
-	user3->addQos(0);
-	//create user4
-	user* user4 = new user(4);
-	user4->addTask(*task7);
-	user4->addQos(0);
-	user4->addTask(*task8);
-	user4->addQos(0);
-	user4->addTask(*task9);
-	user4->addQos(0);
-
-	//create cloudlet1
-	cloudlet* cl1 = new cloudlet(2,5,4);
-	cl1->addUser(*user1);
-	cl1->addUser(*user2);
-	//create cloudlet2
-	cloudlet* cl2 = new cloudlet(1,5,4);
-	cl2->addUser(*user3);
-	cl2->addUser(*user4);
-
-	int next1 = nextService1(*cl1, numServices, storageCosts);		
-	cout << next1 << endl;
-	int next = nextService2(*cl1, numServices, storageCosts);		
-	cout << next << endl;
-}*/
-
 int main(int argc, char** argv){
 	cout << "Enter filename: " << endl;
 	string fn;
@@ -371,4 +310,8 @@ int main(int argc, char** argv){
 	vector<task> tasks = makeTasks(in.at(4),servs);
 	vector<user> users = makeUsers(in.at(2),tasks);
 	connect(cls,users,in.at(1));
+	vector<int> chosen = selectServices1(cls,servs);
+	for(int i = 0; i < chosen.size(); i++){
+		cout << chosen.at(i) << endl;
+	}
 }
