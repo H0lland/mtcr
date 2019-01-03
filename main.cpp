@@ -256,6 +256,26 @@ std::vector<int> selectServices1(vector<cloudlet> cls, vector<service> servs){
 	return rtn;
 }
 
+//scheduleGlobal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
+vector<vector<vector<int>>> scheduleGlobal(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<int> pool){
+	//initializations
+	vector<vector<vector<int>>> rtn;
+	//create a 2d vec for each cloudlet
+	for(int i = 0 ; i < cls.size(); i++){
+		vector<vector<int>> clVec;
+		rtn.push_back(clVec);
+	}
+	//create a 2d vec for the status of each task
+	vector<vector<bool>> scheded;
+	for(int i =0; i < users.size(); i++){
+		vector<bool> temp;
+		for(int j = 0; j < users.at(i).getTasks().size(); j++){
+			temp.push_back(false);
+		}
+		scheded.push_back(temp);
+	}
+	
+}
 //takes in a string and splits it into a 2D array of ints
 vector<vector<int>> arrayify(string line){
 	vector<vector<int>> rtn;
@@ -285,6 +305,7 @@ vector<vector<int>> arrayify(string line){
 	}
 	return rtn;
 }
+
 int main(int argc, char** argv){
 	cout << "Enter filename: " << endl;
 	string fn;
