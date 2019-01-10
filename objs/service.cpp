@@ -24,3 +24,7 @@ int service::getPlace(){
 int service::getSched(){
 	return schedCost;
 }
+
+bool service::operator==(service rhs){
+	return this->getKey() == rhs.getKey();
+}

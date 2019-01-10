@@ -257,12 +257,12 @@ std::vector<int> selectServices1(vector<cloudlet> cls, vector<service> servs){
 }
 
 //scheduleGlobal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
-vector<vector<vector<int>>> scheduleGlobal(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<int> pool){
+vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<int> pool){
 	//initializations
-	vector<vector<vector<int>>> rtn;
+	vector<vector<vector<vector<int>>>> rtn;
 	//create a 2d vec for each cloudlet
 	for(int i = 0 ; i < cls.size(); i++){
-		vector<vector<int>> clVec;
+		vector<vector<vector<int>>> clVec;
 		rtn.push_back(clVec);
 	}
 	//create a 2d vec for the status of each task
@@ -274,8 +274,45 @@ vector<vector<vector<int>>> scheduleGlobal(vector<cloudlet> cls, vector<user> us
 		}
 		scheded.push_back(temp);
 	}
-	
+	//for each service
+	for(int i = 0; i < servs.size(); i++){
+		vector<int> profits;
+		vector<vector<vector<int>>> tasks;
+		//for each cloudlet
+		for(int j = 0; j < cls.size(); j++){
+			int prof = 0;
+			vector<vector<int>> jTasks;
+			//for each user
+			for(int k = 0; k < users.size(); k++){
+				//for each of that user's tasks
+				for(int l = 0; l < users.at(k).getTasks().size(); l++){
+					//if the task hasn't been scheduled and is of type i
+					if(!scheded.at(k).at(l)&&users.at(k).getTasks().at(l).getType()==servs.at(i)){
+						//if the task is servible by cloudlet
+						if(servible(l, users.at(k), cls.at(j))){
+							//add profit
+							prof += 1;
+							vector<int> t{ k, l};
+							jTasks.push_back(t);
+						}
+					}
+				}
+			}
+			tasks.push_back(jTasks);		
+			profits.push_back(prof);
+		}
+		//choose largest
+		int chosen = maxElement(profits);
+		//add the service and tasks to that cloudlet's lists
+		vector<int> s {servs.at(i).getKey()};
+		rtn.at(chosen).at(0).push_back(s);
+		for(int x = 0; x < tasks.at(chosen).size(); x++){
+			rtn.at(chosen).at(1).push_back(tasks.at(chosen).at(x));
+		}
+	}
+	return rtn;
 }
+
 //takes in a string and splits it into a 2D array of ints
 vector<vector<int>> arrayify(string line){
 	vector<vector<int>> rtn;

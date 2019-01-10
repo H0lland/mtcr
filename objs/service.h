@@ -8,4 +8,5 @@ class service{
 		int getStor();
 		int getPlace();
 		int getSched();
+		bool operator==(service rhs);
 };
