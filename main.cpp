@@ -93,7 +93,7 @@ vector<task> makeTasks(vector<vector<int>> params, vector<service> servs){
 }
 
 //Servible: determine if a task is servible by a cloudlet (assuming the proper service is placed on that cloudlet
-bool servible(int pos, user U, cloudlet cl){
+bool servible(int pos, user U, cloudlet cl, vector<vector<int>> dists){
 	//initializations
 	bool servible = 1;
 	bool local = 0;
@@ -289,7 +289,7 @@ vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<
 					//if the task hasn't been scheduled and is of type i
 					if(!scheded.at(k).at(l)&&users.at(k).getTasks().at(l).getType()==servs.at(i)){
 						//if the task is servible by cloudlet
-						if(servible(l, users.at(k), cls.at(j))){
+						if(servible(l, users.at(k), cls.at(j),dists)){
 							//add profit
 							prof += 1;
 							vector<int> t{ k, l};
