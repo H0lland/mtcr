@@ -35,9 +35,9 @@ def main():
 
 	#set variables for dists construction
 	minLocalDist = 10
-	maxLocalDist = 100
-	maxGlobalDist = 500
-	minCloudDist = 250
+	maxLocalDist = 30
+	maxGlobalDist = 100
+	minCloudDist = 70
 	dists = []
 	#for each cloudlet
 	for i in range(cloudlets):
@@ -60,9 +60,9 @@ def main():
 	dists.append(tmp)
 
 	#set service variables for tasks construction
-	inSizes = [20,30,40,30,20]
+	inSizes = [40,60,80,60,40]
 	outSizes = [9,11,15,10,8]
-	compTimes = [1,1,1,1,1]
+	compTimes = [3,7,2,10,9]
 	#the number of occurrences out of 1000 for the most common service 
 	zipfBases = [437,656,801,911,1000]
 	tasks = []
