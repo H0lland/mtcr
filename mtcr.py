@@ -38,9 +38,16 @@ for i in range(len(tasks)):
 
 #other constants
 services = 5
-storageCosts = [1,1,1,1,1]
+alpha = 2
+storageCosts = [2,2,2,2,2]
 placementCosts = [3,2,1,2,1]
-schedulingCosts = [1,2,3,1,3]
+cloudSched = [1,2,3,1,3]
+edgeSched = [x*alpha for x in cloudSched]
+schedulingCosts = []
+#for each edge
+for i in range(len(specs)-1):
+	schedulingCosts.append(edgeSched.copy())
+schedulingCosts.append(cloudSched.copy())
 
 #create the model
 model = Model('MTCR Optimization')
@@ -49,7 +56,7 @@ placing = model.addVars(services,len(dists),vtype = GRB.BINARY, name = "placing"
 
 #create scheduling matrix
 schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY, name = "scheduling")
-
+ 
 #cloudlet spec constraints
 #storage
 for j in range(0,len(specs)):
@@ -105,15 +112,15 @@ for m in range(services):
 for j in range(0,len(specs)):
     for t in range(0,len(tasks)):
         ty = tasks[t][4]
-        obj.add(schedule[t,j],schedulingCosts[ty])
+        obj.add(schedule[t,j],schedulingCosts[j,ty])
 
 #set objective and optimize
 model.setObjective(obj, GRB.MINIMIZE)
 model.optimize()
 
 #print variables
-'''for v in model.getVars():
+for v in model.getVars():
 		if v.X != 0:
-			print(v.Varname, v.X)'''
+			print(v.Varname, v.X)
 fName = inFile.split('.')[0]
 model.write(fName + ".sol")

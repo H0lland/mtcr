@@ -84,7 +84,7 @@ def main():
 			tasks.append(tmp)
 
 	#set variables for specs construction
-	minStor = 4
+	minStor = 2
 	maxStor = 2 * minStor
 	minBand = 10
 	maxBand = 4 * minBand
