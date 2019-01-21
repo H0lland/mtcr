@@ -8,6 +8,7 @@ def main():
 	users = int(sys.argv[2])
 	tasks = 2 * users 
 	out = sys.argv[3]
+	qosFactor = int(sys.argv[4])/10
 	#out = input("Outname: ")
 	#set variables for constructing conns
 	minUsers = 1
@@ -62,7 +63,7 @@ def main():
 	#set service variables for tasks construction
 	inSizes = [40,60,80,60,40]
 	outSizes = [9,11,15,10,8]
-	compTimes = [3,7,2,10,9]
+	compTimes = [3,5,2,7,2]
 	#the number of occurrences out of 1000 for the most common service 
 	zipfBases = [437,656,801,911,1000]
 	tasks = []
@@ -91,14 +92,18 @@ def main():
 	minProcs = 3
 	maxProcs = 3 * minProcs
 	specs = []
-	for i in range(cloudlets):
+	'''for i in range(cloudlets):
 		#determine importance of the cloudlet
 		scale = random()
 		#choose specs based on importance
 		stor = minStor+round((maxStor-minStor)*scale)
 		band = minBand+round((maxBand-minBand)*scale)
 		procs = minProcs+round((maxProcs-minProcs)*scale)
-		specs.append([stor,band,procs])
+		specs.append([stor,band,procs])'''
+	specs.append([3,34,8])
+	specs.append([2,15,4])
+	specs.append([2,14,4])
+	specs.append([3,28,7])
 	specs.append([10000,10000,10000])	
 
 	#set variables for QoS construction
@@ -110,7 +115,7 @@ def main():
 			#if task is assigned to user i
 			if tasks[j][0] == i:
 				#append thrice the computation time for qos
-				tmp.append(3*tasks[j][3])
+				tmp.append(qosFactor*tasks[j][3])
 		qos.append(tmp)	
 
 	#open file for output

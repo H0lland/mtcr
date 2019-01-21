@@ -2,8 +2,8 @@
 import sys
 def main():
 	#read from solution file
-	#inName = input("Sol file: ")
 	inName = sys.argv[1]
+	outName = sys.argv[2]
 	inFile = open(inName+".sol","r")
 	lines = inFile.readlines()
 	inFile.close()
@@ -25,8 +25,9 @@ def main():
 					cloudCnt += 1
 
 	#append data
-	outFile = open("sol.cnt","a+")
-	outFile.write(inName+":\t"+str(cloudCnt)+"/"+str(schedCnt)+"\n")
+	outFile = open(str(outName)+".csv","a+")
+	print(str(outName)+".csv")
+	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+"\n")
 	outFile.close()
 
 main()

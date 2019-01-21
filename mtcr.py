@@ -5,6 +5,7 @@ import sys
 #read in from scenario file
 #inFile = input("Config name: ")
 inFile = sys.argv[1]
+beta = int(sys.argv[2])/2
 file = open(inFile+".gcon","r")
 lines = file.readlines()
 
@@ -22,7 +23,7 @@ conns = list(map(int,conns))
 qos = lines[2][:-2].split(";")
 for i in range(len(qos)):
     qos[i] = qos[i][:-1].split(",")
-    qos[i] = list(map(int,qos[i]))
+    qos[i] = list(map(float,qos[i]))
 
 #parse user-cloudlet distances
 dists = lines[3][:-2].split(";")
@@ -38,11 +39,10 @@ for i in range(len(tasks)):
 
 #other constants
 services = 5
-alpha = 2
 storageCosts = [2,2,2,2,2]
 placementCosts = [3,2,1,2,1]
 cloudSched = [1,2,3,1,3]
-edgeSched = [x*alpha for x in cloudSched]
+edgeSched = [x*beta for x in cloudSched]
 schedulingCosts = []
 #for each edge
 for i in range(len(specs)-1):

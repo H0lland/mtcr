@@ -1,20 +1,22 @@
 #!/bin/bash
-#usage: contr.sh start stop step numPer
-echo "${1}"
-echo "${2}"
-echo "${3}"
-echo "${4}"
+#usage: contr.sh start stop step numPer out
 num=$1
 step=$3
 str='outs/out'
-until [ $num -gt $2 ]; do
-	counter=0
-	echo $num	
-	until [ "${counter}" = "${4}" ]; do
-		./gen.py 4 $num "${str}${num}-${counter}"
-		./mtcr.py "${str}${num}-${counter}"
-		./scrape.py "${str}${num}-${counter}"
-		let counter+=1 
+out=$5
+qos=30
+beta=2
+until [ $beta -gt 10 ]; do
+#until [ $num -gt $stop ]; do
+	echo ${beta} >> "betatest.log"
+	counter=0	
+	until [ "${counter}" = "${4}" ]; do	
+		./gen.py 4 $num "${str}${num}-${beta}-${counter}" $qos
+		./mtcr.py "${str}${num}-${beta}-${counter}" $beta
+		./scrape.py "${str}${num}-${beta}-${counter}" ${out}
+		let counter+=1 	
 	done
-	let num+=$step
+	let "beta++"
+	#let "qos--"	
+	#let num+=$step
 done
