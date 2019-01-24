@@ -1,13 +1,18 @@
 #include "cloudlet.h"
 using std::vector;
 
-cloudlet::cloudlet(int s, int b, int p){
+cloudlet::cloudlet(int s, int b, int p, int k){
 	storage = s;
 	bandw = b;
 	procs = p;
 	remStor = s;
 	remBand = b;
 	remProcs = p;
+	key = k;
+}
+
+int cloudlet::getKey(){
+	return key;
 }
 
 int cloudlet::getStor(){

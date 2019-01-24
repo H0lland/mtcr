@@ -93,7 +93,7 @@ for t in range(0,len(tasks)):
 		taskNum = t % 2
 		#for each cloudlet
 		for k in range(0,len(specs)):
-			upTime = tasks[t][1] * .001* dists[k][user]
+			upTime = tasks[t][1] * .001 * dists[k][user]
 			downTime = tasks[t][2] * .001 * dists[k][user]
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime

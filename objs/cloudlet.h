@@ -4,14 +4,15 @@ using std::vector;
 
 class cloudlet{
 	private:
-		int storage, bandw, procs, remStor, remBand, remProcs;
+		int storage, bandw, procs, remStor, remBand, remProcs, key;
 		std::vector<user> connUs;
 		std::vector<int> servs;
 		std::vector<task> tasks;
 
 	public:
-		cloudlet(int s, int b, int p);
-
+		cloudlet(int s, int b, int p, int k);
+		
+		int getKey();
 		int getStor();
 		int getBand();
 		int getProcs();
