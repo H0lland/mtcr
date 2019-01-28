@@ -96,11 +96,11 @@ vector<task> makeTasks(vector<vector<int>> params, vector<service> servs){
 bool servible(int pos, user U, cloudlet cl, vector<vector<int>> dists){
 	//initializations
 	bool servible = 1;
-	bool local = 0;
-	bool flag = (pos == 1 && U.getKey()== 6 && cl.getKey() == 0);
+	bool local = 0;	
 	task tas = U.getTasks().at(pos);
 	service serv = tas.getType();
 	int key = U.getKey();
+	bool flag = (cl.getKey() == 0 && serv.getKey() == 2 && (key == 5 || key == 6));	
 	vector<user> users = cl.getUsers();
 	//see if user is connected to cloudlet	
 	for(int i = 0; i< users.size(); i++){
@@ -130,6 +130,8 @@ bool servible(int pos, user U, cloudlet cl, vector<vector<int>> dists){
 		double up = tas.getIn() * .001 * dist;
 		double down = tas.getOut() * .001 * dist;
 		double total = up + down + tas.getComp();
+		if(flag)
+			cout << "134: " << total << '\t' << up << '\t' << down << '\t' << dist << '\t' << U.getQos().at(pos) << endl;
 		if(total > U.getQos().at(pos)){
 			servible = 0;
 		}

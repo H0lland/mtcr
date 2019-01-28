@@ -97,7 +97,9 @@ for t in range(0,len(tasks)):
 			downTime = tasks[t][2] * .001 * dists[k][user]
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
-			model.addConstr(tot*schedule[t,j] <= qos[user][taskNum], "QoS Constraint")
+			if(t == 10 or t == 13):
+				print(tot <= qos[user][taskNum])
+			model.addConstr(tot*schedule[t,k] <= qos[user][taskNum], "QoS Constraint")
 
 #objective function
 obj = model.getObjective() 
