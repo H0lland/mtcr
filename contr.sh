@@ -8,7 +8,6 @@ qos=30
 beta=2
 until [ $beta -gt 10 ]; do
 #until [ $num -gt $stop ]; do
-	echo ${beta} >> "betatest.log"
 	counter=0	
 	until [ "${counter}" = "${4}" ]; do	
 		./gen.py 4 $num "${str}${num}-${beta}-${counter}" $qos
@@ -20,3 +19,4 @@ until [ $beta -gt 10 ]; do
 	#let "qos--"	
 	#let num+=$step
 done
+./average.py ${out}

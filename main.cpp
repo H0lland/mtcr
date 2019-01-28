@@ -369,10 +369,41 @@ vector<vector<int>> arrayify(string line){
 	return rtn;
 }
 
+int costOf(vector<vector<vector<vector<int>>>> answer, vector<int> placeCosts, vector<vector<int>> schedCosts, vector<user> users){
+	//initializations
+	int cost = 0;
+	//loops for each cloudlet
+	for(int i = 0; i < answer.size(); i++){
+		//loops for place and schedule
+		for(int j = 0; j < 2; j++){
+			//loop over nested list
+			for(int k = 0; k < answer.at(i).at(j).size(); k++){
+				for(int l = 0; l < answer.at(i).at(j).at(k).size(); l++){
+					int val = answer.at(i).at(j).at(k).at(l);
+					//if scheduling
+					if(j == 0){
+						cost += placeCosts.at(val);
+					}
+					//if placing
+					else{
+						//at task level
+						if(l == 1){
+							int currU = answer.at(i).at(j).at(k).at(0);
+							int serv = users.at(currU).getTasks().at(val).getType().getKey();
+							cost += schedCosts.at(i).at(serv);
+						}
+					}
+				}
+			}
+		}
+	}
+	return cost;
+}
 int main(int argc, char** argv){
 	cout << "Enter filename: " << endl;
 	string fn;
 	cin >> fn;
+	int alpha = 2;
 	vector<vector<vector<int>>> in = parseIn(fn);
 	for(int i=0; i< in.size(); i+=1){
 		for(int j = 0; j < in.at(i).size(); j+=1){
@@ -395,8 +426,22 @@ int main(int argc, char** argv){
 	vector<user> users = makeUsers(in.at(2),tasks);
 	connect(cls,users,in.at(1));
 	vector<int> chosen = selectServices1(cls,servs);
-	for(int i = 0; i < chosen.size(); i++){
+	/*for(int i = 0; i < chosen.size(); i++){
 		cout << chosen.at(i) << endl;
+	}*/
+	//make schedCost vector
+	vector<int> place;
+	for(int i = 0; i < servs.size(); i++){
+		sched.push_back(servs.at(i).getPlace());
+	}
+	//make placeCost vector
+	vector<vector<int>> sched;
+	for(int i = 0; i < cls.size(); i++){
+		vector<int> temp;
+		for(int j = 0; j < servs.size(); j++){
+			temp.push_back(servs.at(j).getSched());
+		}
+		place.push_back(temp);
 	}
 	vector<vector<vector<vector<int>>>> answer = scheduleGlobal(cls, users, dists, servs, chosen, 2);
 	for(int i = 0; i < answer.size(); i++){
@@ -415,4 +460,5 @@ int main(int argc, char** argv){
 			cout << endl;
 		}
 	}
+	cout << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
 }
