@@ -39,6 +39,18 @@ int cloudlet::getRemProcs(){
 	return remProcs;
 }
 
+void cloudlet::reduceStor(int n){
+	remStor -= n;
+}
+
+void cloudlet::reduceBand(int n){
+	remBand -= n;
+}
+
+void cloudlet::reduceProcs(int n){
+	remProcs -= n;
+}
+
 std::vector<user> cloudlet::getUsers(){
 	return connUs;
 }

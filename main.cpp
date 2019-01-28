@@ -215,7 +215,7 @@ int maxElement(vector<double> vec){
 	return max;
 }
 
-//Greedy Global Algorithm 1: Select services based on number of tasks of a type of service across the entire system
+//Meh
 std::vector<int> selectServices1(vector<cloudlet> cls, vector<service> servs){
 	int numSer = servs.size();
 	vector<float> buckets;
@@ -273,6 +273,64 @@ std::vector<int> selectServices1(vector<cloudlet> cls, vector<service> servs){
 }
 
 //scheduleGlobal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
+vector<vector<vector<vector<int>>>> scheduleGlobalR(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<int> pool, int alpha){
+	cout << "277\n";
+	//initializations
+	vector<vector<vector<vector<int>>>> rtn;
+	//create a 2d vec for each cloudlet
+	for(int i = 0 ; i < cls.size(); i++){
+		vector<vector<vector<int>>> clVec(2);
+		rtn.push_back(clVec);
+	}
+	//create a 2d vec for the status of each task
+	vector<vector<bool>> scheded;
+	for(int i =0; i < users.size(); i++){
+		vector<bool> temp;
+		for(int j = 0; j < users.at(i).getTasks().size(); j++){
+			temp.push_back(false);
+		}
+		scheded.push_back(temp);
+	}
+	cout << "294\n";
+	//for each service
+	for(int i = 0; i < servs.size(); i++){	
+		vector<vector<vector<int>>> tasks;
+		//randomly place on a cloudlet
+		int j = rand() % 5;
+		vector<vector<int>> jTasks;
+		//for each user
+		for(int k = 0; k < users.size(); k++){
+			//for each of that user's tasks
+			for(int l = 0; l < users.at(k).getTasks().size(); l++){	
+				//if the task hasn't been scheduled and is of type i
+				if(!scheded.at(k).at(l)&&users.at(k).getTasks().at(l).getType()==servs.at(i)){
+					//if the task is servible by cloudlet
+					if(servible(l, users.at(k), cls.at(j),dists)){	
+						//add profit
+						vector<int> t{ k, l};
+						jTasks.push_back(t);
+						cls.at(j).reduceStor(servs.at(i).getStor());
+						cls.at(j).reduceProcs(users.at(k).getTasks().at(l).getComp());
+					}
+				}
+			}
+		}
+		cout << "316\n";
+		//add the service and tasks to that cloudlet's lists
+		tasks.push_back(jTasks);
+		vector<int> s;
+		int chosen = j;
+		s.push_back(servs.at(i).getKey());		
+		rtn.at(chosen).at(0).push_back(s);
+		cout << "323\n";
+		for(int x = 0; x < jTasks.size(); x++){
+			rtn.at(chosen).at(1).push_back(jTasks.at(x));
+		}	
+	}
+	return rtn;
+}
+
+//scheduleGlobal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
 vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<int> pool, int alpha){
 	//initializations
 	vector<vector<vector<vector<int>>>> rtn;
@@ -311,6 +369,8 @@ vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<
 							prof += 1;
 							vector<int> t{ k, l};
 							jTasks.push_back(t);
+							cls.at(j).reduceStor(servs.at(i).getStor());
+							cls.at(j).reduceProcs(users.at(k).getTasks().at(l).getComp());
 						}
 					}
 				}
@@ -432,7 +492,7 @@ int main(int argc, char** argv){
 	//make schedCost vector
 	vector<int> place;
 	for(int i = 0; i < servs.size(); i++){
-		sched.push_back(servs.at(i).getPlace());
+		place.push_back(servs.at(i).getPlace());
 	}
 	//make placeCost vector
 	vector<vector<int>> sched;
@@ -441,7 +501,7 @@ int main(int argc, char** argv){
 		for(int j = 0; j < servs.size(); j++){
 			temp.push_back(servs.at(j).getSched());
 		}
-		place.push_back(temp);
+		sched.push_back(temp);
 	}
 	vector<vector<vector<vector<int>>>> answer = scheduleGlobal(cls, users, dists, servs, chosen, 2);
 	for(int i = 0; i < answer.size(); i++){

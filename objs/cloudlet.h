@@ -19,6 +19,9 @@ class cloudlet{
 		int getRemStor();
 		int getRemBand();
 		int getRemProcs();
+		void reduceStor(int n);
+		void reduceBand(int n);
+		void reduceProcs(int n);
 		std::vector<user> getUsers();
 		std::vector<int> getServs();
 		std::vector<task> getTasks();
