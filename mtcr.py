@@ -62,7 +62,7 @@ schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY, name = "sched
 for j in range(0,len(specs)):
 	sumM = 0
 	for m in range(0,len(storageCosts)):
-		sumM += storageCosts[m]*placing[m,j]
+		sumM += storageCosts[m]*placing[m,j]	
 	model.addConstr(sumM <= specs[j][0],"Storage" + str(j))
 
 #processing
@@ -75,6 +75,7 @@ for j in range(0,len(specs)):
 #Completion constraints
 model.addConstr(schedule.sum() == len(tasks),"All tasks")
 
+#uniqueness constraints
 for t in range(0,len(tasks)):
 	sumCom = 0
 	for j in range(0,len(specs)):
@@ -97,8 +98,6 @@ for t in range(0,len(tasks)):
 			downTime = tasks[t][2] * .001 * dists[k][user]
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
-			if(t == 10 or t == 13):
-				print(tot <= qos[user][taskNum])
 			model.addConstr(tot*schedule[t,k] <= qos[user][taskNum], "QoS Constraint")
 
 #objective function
