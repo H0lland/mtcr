@@ -1,15 +1,15 @@
 #!/usr/bin/env python3.7
-from random import randrange,random
+#usage: ./gen.py cloudlets users services qos out
+from random import randrange,random,uniform
 import sys
 def main():
-	#cloudlets = int(input("# Cloudlets: "))
-	#users = int(input("# Users: "))
+	#reading in commandlines
 	cloudlets = int(sys.argv[1])
 	users = int(sys.argv[2])
-	tasks = 2 * users 
-	out = sys.argv[3]
+	tasks = 2 * users
+	servs = sys.argv[3]
 	qosFactor = int(sys.argv[4])/10
-	#out = input("Outname: ")
+	out = sys.argv[5]
 	#set variables for constructing conns
 	minUsers = 1
 	maxUsers = 4 * minUsers
@@ -60,27 +60,37 @@ def main():
 		tmp.append(elem)
 	dists.append(tmp)
 
+	#set variables for service construction
+	servLst = []
+	#construct servs
+	for i in range(servs):
+		tmp = []
+		#append key, inSize, outSize, comps, placement cost, schedule cost
+		tmp.append(i)
+		tmp.append(randrange(minIn,maxIn))
+		tmp.append(randrange(minOut,maxOut))
+		tmp.append(randrange(minComps,maxComps))
+		tmp.append(randrange(minPlace,maxPlace))
+		tmp.append(randrange(minSched,maxSched))
+		servLst.append(tmp)
+
 	#set service variables for tasks construction
-	inSizes = [40,60,80,60,40]
-	outSizes = [9,11,15,10,8]
-	compTimes = [3,5,2,7,2]
-	#the number of occurrences out of 1000 for the most common service 
-	zipfBases = [437,656,801,911,1000]
+	#inSizes = [40,60,80,60,40]
+	#outSizes = [9,11,15,10,8]
+	#compTimes = [3,5,2,7,2]
+	#the number of occurrences out of 1000 for the most common service
+	#zipfBases = [437,656,801,911,1000]
 	tasks = []
 	for i in range(users):
 		#2 tasks for user
 		for j in range(2):
 			tmp = []
 			tmp.append(i)
-			serv = randrange(1,1001)
-			servType = -1
-			#determine where in the zipf distribution the thing fell
-			for k in range(len(zipfBases)):
-				if serv <= zipfBases[k] and servType == -1:
-					servType = k
-			tmp.append(inSizes[servType])
-			tmp.append(outSizes[servType])
-			tmp.append(compTimes[servType])
+			servType = uniform(1,servs)
+			#servType = randServ
+			tmp.append(servLst[servType][1])
+			tmp.append(servLst[servType][2])
+			tmp.append(servLst[servType][3])
 			tmp.append(servType)
 			tasks.append(tmp)
 
@@ -104,7 +114,7 @@ def main():
 	specs.append([2,15,4])
 	specs.append([2,14,4])
 	specs.append([3,28,7])
-	specs.append([10000,10000,10000])	
+	specs.append([10000,10000,10000])
 
 	#set variables for QoS construction
 	qos = []
@@ -116,7 +126,8 @@ def main():
 			if tasks[j][0] == i:
 				#append thrice the computation time for qos
 				tmp.append(qosFactor*tasks[j][3])
-		qos.append(tmp)	
+		qos.append(tmp)
+
 
 	#open file for output
 	file = open(out+".gcon","w")
@@ -147,6 +158,12 @@ def main():
 	for i in range(len(tasks)):
 		for j in range(len(tasks[i])):
 			file.write(str(tasks[i][j])+",")
+		file.write(";")
+	file.write("\n")
+	#write servs
+	for i in range(len(servLst)):
+		for j in range(len(servLst[i])):
+			file.write(str(servLst[i][j])+",")
 		file.write(";")
 	file.write("\n")
 	file.close()

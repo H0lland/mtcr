@@ -1,11 +1,13 @@
 class service{
 	private:
-		int key, stor, placeCost, schedCost;
+		int key, inSize, outSize, comps, placeCost, schedCost;
 	public:
 		service();
-		service(int k,int st, int pc, int sc);
+		service(int k, int inSize, int outSize, int comps, int pc, int sc);
 		int getKey();
-		int getStor();
+		int getIn();
+		int getOut();
+		int getComp();
 		int getPlace();
 		int getSched();
 		bool operator==(service rhs);

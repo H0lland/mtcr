@@ -13,8 +13,16 @@ int service::getKey(){
 	return key;
 }
 
-int service::getStor(){
-	return stor;
+int service::getIn(){
+	return inSize;
+}
+
+int service::getOut(){
+	return outSize;
+}
+
+int service::getComp(){
+	return comps;
 }
 
 int service::getPlace(){
