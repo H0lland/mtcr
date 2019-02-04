@@ -62,6 +62,16 @@ def main():
 
 	#set variables for service construction
 	servLst = []
+	minIn = 40
+	maxIn = 80
+	minOut = 8
+	maxOut = 15
+	minComp = 2
+	maxComp = 7
+	minPlace = 1
+	maxPlace = 3
+	minSched = 1
+	maxSched = 3
 	#construct servs
 	for i in range(servs):
 		tmp = []

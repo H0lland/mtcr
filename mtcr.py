@@ -37,11 +37,22 @@ for i in range(len(tasks)):
     tasks[i] = tasks[i][:-1].split(",")
     tasks[i] = list(map(int,tasks[i]))
 
+#parse servs data
+servs = lines[5][:-2].split(";")
+for i in range(len(servs)):
+    servs[i] = servs[i][:-1].split(",")
+    servs[i] = list(map(int,servs[i]))
+
 #other constants
 services = 5
+
+#construct storage and placement costs
 storageCosts = [2,2,2,2,2]
-placementCosts = [3,2,1,2,1]
-cloudSched = [1,2,3,1,3]
+placementCosts = []
+cloudSched = []
+for i in range(len(servs)):
+    placementCosts.append(servs[i][4])
+    cloudSched.apped(servs[i][5])
 edgeSched = [x*beta for x in cloudSched]
 schedulingCosts = []
 #for each edge
@@ -56,13 +67,13 @@ placing = model.addVars(services,len(dists),vtype = GRB.BINARY, name = "placing"
 
 #create scheduling matrix
 schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY, name = "scheduling")
- 
+
 #cloudlet spec constraints
 #storage
 for j in range(0,len(specs)):
 	sumM = 0
-	for m in range(0,len(storageCosts)):
-		sumM += storageCosts[m]*placing[m,j]	
+	for m in range(0,len(placementCosts)):
+		sumM += placementCosts[m]*placing[m,j]
 	model.addConstr(sumM <= specs[j][0],"Storage" + str(j))
 
 #processing
@@ -101,7 +112,7 @@ for t in range(0,len(tasks)):
 			model.addConstr(tot*schedule[t,k] <= qos[user][taskNum], "QoS Constraint")
 
 #objective function
-obj = model.getObjective() 
+obj = model.getObjective()
 
 
 #add placement terms
