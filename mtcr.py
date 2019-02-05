@@ -52,7 +52,7 @@ placementCosts = []
 cloudSched = []
 for i in range(len(servs)):
     placementCosts.append(servs[i][4])
-    cloudSched.apped(servs[i][5])
+    cloudSched.append(servs[i][5])
 edgeSched = [x*beta for x in cloudSched]
 schedulingCosts = []
 #for each edge

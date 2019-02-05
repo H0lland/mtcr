@@ -7,8 +7,8 @@ def main():
 	cloudlets = int(sys.argv[1])
 	users = int(sys.argv[2])
 	tasks = 2 * users
-	servs = sys.argv[3]
-	qosFactor = int(sys.argv[4])/10
+	servs = int(sys.argv[3])
+	qosFactor = int(sys.argv[4])/2
 	out = sys.argv[5]
 	#set variables for constructing conns
 	minUsers = 1
@@ -66,8 +66,8 @@ def main():
 	maxIn = 80
 	minOut = 8
 	maxOut = 15
-	minComp = 2
-	maxComp = 7
+	minComps = 2
+	maxComps = 7
 	minPlace = 1
 	maxPlace = 3
 	minSched = 1
@@ -96,8 +96,9 @@ def main():
 		for j in range(2):
 			tmp = []
 			tmp.append(i)
-			servType = uniform(1,servs)
+			#servType = uniform(1,servs)
 			#servType = randServ
+			servType = randrange(0,servs)
 			tmp.append(servLst[servType][1])
 			tmp.append(servLst[servType][2])
 			tmp.append(servLst[servType][3])
