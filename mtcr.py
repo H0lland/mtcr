@@ -1,11 +1,12 @@
 #!/usr/bin/env python3.7
 from gurobipy import *
+from random import randrange
 import sys
 #Data
 #read in from scenario file
 #inFile = input("Config name: ")
 inFile = sys.argv[1]
-beta = int(sys.argv[2])/2
+beta = int(sys.argv[2])/10
 file = open(inFile+".gcon","r")
 lines = file.readlines()
 
@@ -43,17 +44,14 @@ for i in range(len(servs)):
     servs[i] = servs[i][:-1].split(",")
     servs[i] = list(map(int,servs[i]))
 
-#other constants
-services = 5
-
 #construct storage and placement costs
-storageCosts = [2,2,2,2,2]
+#storageCosts = [2,2,2,2,2]
 placementCosts = []
 cloudSched = []
 for i in range(len(servs)):
-    placementCosts.append(servs[i][4])
-    cloudSched.append(servs[i][5])
-edgeSched = [x*beta for x in cloudSched]
+	placementCosts.append(servs[i][4])
+	cloudSched.append(servs[i][5])
+edgeSched = [x*randrange(1,beta) for x in cloudSched]
 schedulingCosts = []
 #for each edge
 for i in range(len(specs)-1):
@@ -62,8 +60,9 @@ schedulingCosts.append(cloudSched.copy())
 
 #create the model
 model = Model('MTCR Optimization')
+
 #create placement matrix
-placing = model.addVars(services,len(dists),vtype = GRB.BINARY, name = "placing")
+placing = model.addVars(len(servs),len(dists),vtype = GRB.BINARY, name = "placing")
 
 #create scheduling matrix
 schedule = model.addVars(len(tasks),len(dists),vtype = GRB.BINARY, name = "scheduling")
@@ -114,9 +113,8 @@ for t in range(0,len(tasks)):
 #objective function
 obj = model.getObjective()
 
-
 #add placement terms
-for m in range(services):
+for m in range(len(servs)):
     for j in range(0,len(specs)):
         obj.add(placing[m,j],placementCosts[m])
 
@@ -136,3 +134,5 @@ for v in model.getVars():
 			print(v.Varname, v.X)
 fName = inFile.split('.')[0]
 model.write(fName + ".sol")
+outFile = open(fName+".sol","a+")
+outFile.write(str(model.Runtime))

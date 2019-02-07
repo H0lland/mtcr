@@ -5,10 +5,9 @@ import sys
 def main():
 	#reading in commandlines
 	cloudlets = int(sys.argv[1])
-	users = int(sys.argv[2])
-	tasks = 2 * users
+	users = int(sys.argv[2])	
 	servs = int(sys.argv[3])
-	qosFactor = int(sys.argv[4])/2
+	qosFactor = int(sys.argv[4])/10
 	out = sys.argv[5]
 	#set variables for constructing conns
 	minUsers = 1
@@ -16,7 +15,7 @@ def main():
 	unassigned = users
 	conns = []
 	cl = 0
-	#while there are unassigned users
+	'''#while there are unassigned users
 	while unassigned > 0:
 		#randomly select number to connect to current cloudlet
 		if maxUsers <= unassigned:
@@ -32,8 +31,16 @@ def main():
 		if cl == cloudlets:
 			cl = 0
 		unassigned -= connUs
+	'''
+	#distribute users evenly
+	for i in range(cloudlets):
+		#divide users evenly among cloudlets
+		conned = unassigned//cloudlets
+		unassigned -= conned
+		for j in range(conned):
+			conns.append(i)
 	conns.sort()
-
+	
 	#set variables for dists construction
 	minLocalDist = 10
 	maxLocalDist = 30
@@ -92,8 +99,10 @@ def main():
 	#zipfBases = [437,656,801,911,1000]
 	tasks = []
 	for i in range(users):
-		#2 tasks for user
-		for j in range(2):
+		#tasks for user
+		#numTasks = randrange(2,5)
+		numTasks = 2 
+		for j in range(numTasks):
 			tmp = []
 			tmp.append(i)
 			#servType = uniform(1,servs)
@@ -106,25 +115,26 @@ def main():
 			tasks.append(tmp)
 
 	#set variables for specs construction
-	minStor = 2
+	minStor = 2 * minPlace
 	maxStor = 2 * minStor
-	minBand = 10
+	minBand = 5 * minIn
 	maxBand = 4 * minBand
-	minProcs = 3
-	maxProcs = 3 * minProcs
+	minProcs = 2 * minComps
+	maxProcs = 2 * minProcs
 	specs = []
-	'''for i in range(cloudlets):
+	for i in range(cloudlets):
 		#determine importance of the cloudlet
 		scale = random()
 		#choose specs based on importance
 		stor = minStor+round((maxStor-minStor)*scale)
 		band = minBand+round((maxBand-minBand)*scale)
 		procs = minProcs+round((maxProcs-minProcs)*scale)
-		specs.append([stor,band,procs])'''
-	specs.append([3,34,8])
+		specs.append([stor,band,procs])
+	'''specs.append([3,34,8])
 	specs.append([2,15,4])
 	specs.append([2,14,4])
 	specs.append([3,28,7])
+	'''
 	specs.append([10000,10000,10000])
 
 	#set variables for QoS construction
@@ -135,7 +145,7 @@ def main():
 		for j in range(len(tasks)):
 			#if task is assigned to user i
 			if tasks[j][0] == i:
-				#append thrice the computation time for qos
+				#append qosFactor times the computation time for qos
 				tmp.append(qosFactor*tasks[j][3])
 		qos.append(tmp)
 

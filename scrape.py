@@ -11,7 +11,7 @@ def main():
 	#count the number of schedule placements and the number placed on the cloud
 	cloudCnt = 0
 	schedCnt = 0
-	for i in range(len(lines)):
+	for i in range(len(lines)-1):
 		line = lines[i].split()
 		#check that this variable was set to 1
 		if line[1] == "1":
@@ -25,8 +25,7 @@ def main():
 					cloudCnt += 1
 
 	#append data
-	outFile = open(str(outName)+".csv","a+")
-	print(str(outName)+".csv")
+	outFile = open(str(outName)+".csv","a+")	
 	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+"\n")
 	outFile.close()
 
