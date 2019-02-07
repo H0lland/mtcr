@@ -34,13 +34,13 @@ def main():
 	'''
 	#distribute users evenly
 	for i in range(cloudlets):
-		#divide users evenly among cloudlets
-		conned = unassigned//cloudlets
+		#divide users evenly among unvisited cloudlets
+		conned = unassigned//(cloudlets-i)
 		unassigned -= conned
 		for j in range(conned):
 			conns.append(i)
 	conns.sort()
-	
+	print(conns)
 	#set variables for dists construction
 	minLocalDist = 10
 	maxLocalDist = 30
