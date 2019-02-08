@@ -53,10 +53,28 @@ def main():
 	#set variables for dists construction
 	minLocalDist = 10
 	maxLocalDist = 30
-	maxGlobalDist = 100
-	minCloudDist = 70
+	bounds = 100
+	userDists = []
+	coords = []
 	dists = []
-	#for each cloudlet
+	#set dists between users and their cloudlets
+	for i in range(len(conns)):
+		userDists.append(randrange(10,30))
+	#get the location on each cloudlet
+	for i in range(cloudlets):
+		#randomly get x and y
+		x = randrange(0,100)
+		y = randrange(0,100)
+		coords.append([x,y])
+	#obtain the distances between each cloudlet
+	for i in range(cloudlets):
+		tmp = []
+		for j in range(cloudlets):
+			distance = ((coords[i][1] - coords[j][1])**2 + (coords[i][0] - coords[j][0])**2)**(1/2)
+			tmp.append(distance)
+		dists.append(tmp)
+
+	'''#for each cloudlet
 	for i in range(cloudlets):
 		tmp = []
 		#for each user
@@ -74,7 +92,7 @@ def main():
 	for i in range(users):
 		elem = randrange(minCloudDist, maxGlobalDist)
 		tmp.append(elem)
-	dists.append(tmp)
+	dists.append(tmp)'''
 
 	#set variables for service construction
 	servLst = []
