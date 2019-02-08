@@ -71,7 +71,7 @@ def main():
 		tmp = []
 		for j in range(cloudlets):
 			distance = ((coords[i][1] - coords[j][1])**2 + (coords[i][0] - coords[j][0])**2)**(1/2)
-			tmp.append(distance)
+			tmp.append(round(distance))
 		dists.append(tmp)
 
 	'''#for each cloudlet
@@ -186,33 +186,39 @@ def main():
 			file.write(str(specs[i][j])+",")
 		file.write(";")
 	file.write("\n")
+
 	#write conns
 	for i in range(len(conns)):
 		file.write(str(conns[i]) + ",")
 	file.write("\n")
+
 	#write qos
 	for i in range(len(qos)):
 		for j in range(len(qos[i])):
 			file.write(str(qos[i][j])+",")
 		file.write(";")
 	file.write("\n")
+
 	#write dists
 	for i in range(len(dists)):
 		for j in range(len(dists[i])):
 			file.write(str(dists[i][j]) + ",")
 		file.write(";")
 	file.write("\n")
+
 	#write tasks
 	for i in range(len(tasks)):
 		for j in range(len(tasks[i])):
 			file.write(str(tasks[i][j])+",")
 		file.write(";")
 	file.write("\n")
+
 	#write servs
 	for i in range(len(servLst)):
 		for j in range(len(servLst[i])):
 			file.write(str(servLst[i][j])+",")
 		file.write(";")
 	file.write("\n")
+
 	file.close()
 main()
