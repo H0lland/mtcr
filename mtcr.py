@@ -48,14 +48,18 @@ for i in range(len(servs)):
 #storageCosts = [2,2,2,2,2]
 placementCosts = []
 cloudSched = []
+edgeSched = []
+for i in range(len(specs)-1):
+	edgeSched.append([])
 for i in range(len(servs)):
 	placementCosts.append(servs[i][4])
 	cloudSched.append(servs[i][5])
-edgeSched = [x*randrange(1,beta) for x in cloudSched]
-schedulingCosts = []
+	for j in range(len(specs)-1):
+		edgeSched[j].append(randrange(1,beta)*servs[i][5])
+
+
 #for each edge
-for i in range(len(specs)-1):
-	schedulingCosts.append(edgeSched.copy())
+schedulingCosts = edgeSched.copy()
 schedulingCosts.append(cloudSched.copy())
 
 #create the model
@@ -81,6 +85,25 @@ for j in range(0,len(specs)):
 	for t in range(0,len(tasks)):
 		sumT += tasks[t][3]*schedule[t,j]
 	model.addConstr(sumT <= specs[j][2],"Processing" + str(j))
+
+#bandwidth
+for j in range(0,len(specs)):
+	sumE = 0
+	for t in range(0,len(tasks)):
+		user = tasks[t][0]
+		#in and out sizes
+		inSize = tasks[t][1]
+		outSize = tasks[t][2]
+		#assume locality
+		local = 1
+		remote = 0
+		#if task is non-local
+		if(conns[user] != j):
+			#swap values
+			local = 0
+			remote = 1 
+		sumE += (local* inSize + remote * outSize)* schedule[t,j]
+	model.addConstr(sumE <= specs[j][1], "Bandwidth" + str(j))
 
 #Completion constraints
 model.addConstr(schedule.sum() == len(tasks),"All tasks")

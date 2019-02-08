@@ -12,7 +12,7 @@ servs=10
 until [ $num -gt $2 ]; do
 	counter=0	
 	until [ "${counter}" = "${4}" ]; do	
-		./gen.py 4 $num $servs $qos "${str}${num}-${beta}-${counter}"
+		./gen.py 8 $num $servs $qos "${str}${num}-${beta}-${counter}"
 		./mtcr.py "${str}${num}-${beta}-${counter}" $beta
 		./scrape.py "${str}${num}-${beta}-${counter}" ${out}
 		let counter+=1 	

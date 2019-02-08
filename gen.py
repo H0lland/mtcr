@@ -14,8 +14,9 @@ def main():
 	maxUsers = 4 * minUsers
 	unassigned = users
 	conns = []
+	'''
 	cl = 0
-	'''#while there are unassigned users
+	#while there are unassigned users
 	while unassigned > 0:
 		#randomly select number to connect to current cloudlet
 		if maxUsers <= unassigned:
@@ -40,7 +41,15 @@ def main():
 		for j in range(conned):
 			conns.append(i)
 	conns.sort()
-	print(conns)
+	
+	degs = []
+	minUsers = users//(2*cloudlets)
+	maxUsers = 4*minUsers
+	#create degredation values
+	for i in range(cloudlets):
+		thresh = randrange(minUsers,maxUsers)
+		degs.append(thresh)
+
 	#set variables for dists construction
 	minLocalDist = 10
 	maxLocalDist = 30
@@ -69,10 +78,10 @@ def main():
 
 	#set variables for service construction
 	servLst = []
-	minIn = 40
-	maxIn = 80
-	minOut = 8
-	maxOut = 15
+	minIn = 4
+	maxIn = 8
+	minOut = 2
+	maxOut = 4
 	minComps = 2
 	maxComps = 7
 	minPlace = 1
@@ -100,7 +109,7 @@ def main():
 	tasks = []
 	for i in range(users):
 		#tasks for user
-		#numTasks = randrange(2,5)
+		#numTasks = randrange(1,4)
 		numTasks = 2 
 		for j in range(numTasks):
 			tmp = []
