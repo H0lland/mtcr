@@ -60,16 +60,16 @@ def main():
 	#set dists between users and their cloudlets
 	for i in range(len(conns)):
 		userDists.append(randrange(10,30))
-	#get the location on each cloudlet
-	for i in range(cloudlets):
+	#get the location on each cloudlet/cloud
+	for i in range(cloudlets+1):
 		#randomly get x and y
 		x = randrange(0,100)
 		y = randrange(0,100)
 		coords.append([x,y])
-	#obtain the distances between each cloudlet
-	for i in range(cloudlets):
+	#obtain the distances between each cloudlet/cloud
+	for i in range(cloudlets+1):
 		tmp = []
-		for j in range(cloudlets):
+		for j in range(cloudlets+1):
 			distance = ((coords[i][1] - coords[j][1])**2 + (coords[i][0] - coords[j][0])**2)**(1/2)
 			tmp.append(round(distance))
 		dists.append(tmp)
