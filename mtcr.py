@@ -125,13 +125,20 @@ for j in range(0,len(specs)):
 for t in range(0,len(tasks)):
 		user = tasks[t][0]
 		taskNum = t % 2
+		localCl = conns[user]	
 		#for each cloudlet
+		'''
+		print(tasks[t][1] * .01 * dists[4][localCl],end="\t")
+		print(tasks[t][2] * .01 * dists[4][localCl],end="\t")
+		print(tasks[t][3],end="\t")
+		print(qos[user][taskNum])
+		'''
 		for k in range(0,len(specs)):
-			#upTime = tasks[t][1] * .001 * dists[k][user]
-			#downTime = tasks[t][2] * .001 * dists[k][user]
+			upTime = tasks[t][1] * .01 * dists[k][localCl]
+			downTime = tasks[t][2] * .01 * dists[k][localCl]
 			procTime = tasks[t][3]
-			#tot = upTime + float(procTime) + downTime
-			model.addConstr(procTime*schedule[t,k] <= qos[user][taskNum], "QoS Constraint")
+			tot = upTime + float(procTime) + downTime
+			model.addConstr(tot*schedule[t,k] <= qos[user][taskNum], "QoS Constraint")
 
 #objective function
 obj = model.getObjective()
@@ -146,6 +153,18 @@ for j in range(0,len(specs)):
     for t in range(0,len(tasks)):
         ty = tasks[t][4]
         obj.add(schedule[t,j],schedulingCosts[j][ty])
+
+#add communication terms
+for j in range(0,len(specs)):
+	for t in range(0,len(tasks)):
+		user = tasks[t][0]
+		localCl = conns[user]
+		remote = 1
+		if j == localCl:
+			remote = 0
+		#if not local, add cost of sending packets (normalized to be similar to the schedule/placement costs 
+		sent = remote * (tasks[t][1] + tasks[t][2])//4
+		obj.add(schedule[t,j],sent)
 
 #set objective and optimize
 model.setObjective(obj, GRB.MINIMIZE)

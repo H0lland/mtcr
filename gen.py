@@ -142,11 +142,11 @@ def main():
 			tasks.append(tmp)
 
 	#set variables for specs construction
-	minStor = 2 * minPlace
+	minStor = users * minPlace
 	maxStor = 2 * minStor
-	minBand = 5 * minIn
-	maxBand = 4 * minBand
-	minProcs = 2 * minComps
+	minBand = users * 2 * minIn
+	maxBand = 2 * minBand
+	minProcs = users * minComps
 	maxProcs = 2 * minProcs
 	specs = []
 	for i in range(cloudlets):
