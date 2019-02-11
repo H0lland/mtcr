@@ -153,7 +153,7 @@ for j in range(0,len(specs)):
     for t in range(0,len(tasks)):
         ty = tasks[t][4]
         obj.add(schedule[t,j],schedulingCosts[j][ty])
-
+'''
 #add communication terms
 for j in range(0,len(specs)):
 	for t in range(0,len(tasks)):
@@ -165,6 +165,7 @@ for j in range(0,len(specs)):
 		#if not local, add cost of sending packets (normalized to be similar to the schedule/placement costs 
 		sent = remote * (tasks[t][1] + tasks[t][2])//4
 		obj.add(schedule[t,j],sent)
+'''
 
 #set objective and optimize
 model.setObjective(obj, GRB.MINIMIZE)
@@ -176,5 +177,5 @@ for v in model.getVars():
 			print(v.Varname, v.X)
 fName = inFile.split('.')[0]
 model.write(fName + ".sol")
-outFile = open(fName+".sol","a+")
-outFile.write(str(model.Runtime))
+outFile = open("times.log","a+")
+outFile.write(str(model.Runtime)+'\n')

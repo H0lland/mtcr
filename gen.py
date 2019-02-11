@@ -14,6 +14,7 @@ def main():
 	maxUsers = 4 * minUsers
 	unassigned = users
 	conns = []
+	serving = []
 	'''
 	cl = 0
 	#while there are unassigned users
@@ -35,19 +36,21 @@ def main():
 	'''
 	#distribute users evenly
 	for i in range(cloudlets):
+		serving.append(0)
 		#divide users evenly among unvisited cloudlets
 		conned = unassigned//(cloudlets-i)
 		unassigned -= conned
 		for j in range(conned):
 			conns.append(i)
+			serving[i] += 1
 	conns.sort()
-	
+
 	degs = []
 	minUsers = users//(2*cloudlets)
-	maxUsers = 4*minUsers
+	maxUsers = 3*minUsers	
 	#create degredation values
 	for i in range(cloudlets):
-		thresh = randrange(minUsers,maxUsers)
+		thresh = randrange(minUsers,maxUsers+1)
 		degs.append(thresh)
 
 	#set variables for dists construction
@@ -63,8 +66,8 @@ def main():
 	#get the location on each cloudlet/cloud
 	for i in range(cloudlets+1):
 		#randomly get x and y
-		x = randrange(0,100)
-		y = randrange(0,100)
+		x = randrange(0,bounds)
+		y = randrange(0,bounds)
 		coords.append([x,y])
 	#obtain the distances between each cloudlet/cloud
 	for i in range(cloudlets+1):
@@ -103,9 +106,9 @@ def main():
 	minComps = 2
 	maxComps = 7
 	minPlace = 1
-	maxPlace = 3
+	maxPlace = 5
 	minSched = 1
-	maxSched = 3
+	maxSched = 5
 	#construct servs
 	for i in range(servs):
 		tmp = []
@@ -142,12 +145,12 @@ def main():
 			tasks.append(tmp)
 
 	#set variables for specs construction
-	minStor = users * minPlace
-	maxStor = 2 * minStor
-	minBand = users * 2 * minIn
-	maxBand = 2 * minBand
-	minProcs = users * minComps
-	maxProcs = 2 * minProcs
+	minStor = int(users/(cloudlets) * (maxPlace-minPlace)/2)
+	maxStor = int(1.5 * minStor)
+	minBand = int(users/(cloudlets) * (maxIn - minIn))
+	maxBand = int(1.5 * minBand)
+	minProcs = int(users/(cloudlets) * (maxComps - minComps)/2)
+	maxProcs = int(1.5 * minProcs)
 	specs = []
 	for i in range(cloudlets):
 		#determine importance of the cloudlet
@@ -156,6 +159,9 @@ def main():
 		stor = minStor+round((maxStor-minStor)*scale)
 		band = minBand+round((maxBand-minBand)*scale)
 		procs = minProcs+round((maxProcs-minProcs)*scale)
+		#factor in degradation
+		if serving[i] > degs[i]:
+			procs -= serving[i] - degs[i]
 		specs.append([stor,band,procs])
 	'''specs.append([3,34,8])
 	specs.append([2,15,4])

@@ -1,11 +1,12 @@
 #!/bin/bash
 #usage: contr.sh start stop step numPer out
+./clean.sh
 num=$1
 step=$3
 str='outs1/out'
 out=$5
 qos=25
-beta=50
+beta=40
 servs=1000
 #until [ $beta -gt 50 ]; do
 #until [ $qos -gt 50 ]; do
