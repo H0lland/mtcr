@@ -60,22 +60,31 @@ def main():
 	userDists = []
 	coords = []
 	dists = []
+	cloudDist = 10
 	#set dists between users and their cloudlets
 	for i in range(len(conns)):
 		userDists.append(randrange(10,30))
 	#get the location on each cloudlet/cloud
-	for i in range(cloudlets+1):
+	for i in range(cloudlets):
 		#randomly get x and y
 		x = randrange(0,bounds)
 		y = randrange(0,bounds)
 		coords.append([x,y])
 	#obtain the distances between each cloudlet/cloud
-	for i in range(cloudlets+1):
+	for i in range(cloudlets):
 		tmp = []
-		for j in range(cloudlets+1):
+		for j in range(cloudlets):
 			distance = ((coords[i][1] - coords[j][1])**2 + (coords[i][0] - coords[j][0])**2)**(1/2)
 			tmp.append(round(distance))
 		dists.append(tmp)
+	tmp = []
+	#handle the distance for the cloud
+	for i in range(len(dists)):
+		dists[i].append(int(bounds*(2**(1/2))*cloudDist))
+		tmp.append(int(bounds*(2**(1/2))*cloudDist))
+	tmp.append(0)
+	dists.append(tmp)	
+		
 
 	'''#for each cloudlet
 	for i in range(cloudlets):
@@ -99,7 +108,7 @@ def main():
 
 	#set variables for service construction
 	servLst = []
-	minIn = 4
+	'''	minIn = 4
 	maxIn = 8
 	minOut = 2
 	maxOut = 4
@@ -109,6 +118,17 @@ def main():
 	maxPlace = 5
 	minSched = 1
 	maxSched = 5
+	'''	
+	minIn = 1
+	maxIn = 2
+	minOut = 1
+	maxOut = 2
+	minComps = 1
+	maxComps = 2
+	minPlace = 1
+	maxPlace = 2
+	minSched = 1
+	maxSched = 2
 	#construct servs
 	for i in range(servs):
 		tmp = []
@@ -130,8 +150,8 @@ def main():
 	tasks = []
 	for i in range(users):
 		#tasks for user
-		#numTasks = randrange(1,4)
-		numTasks = 2 
+		#numTasks = randrange(1,5)
+		numTasks = 1 
 		for j in range(numTasks):
 			tmp = []
 			tmp.append(i)
@@ -152,7 +172,7 @@ def main():
 	minProcs = int(users/(cloudlets) * (maxComps - minComps)/2)
 	maxProcs = int(1.5 * minProcs)
 	specs = []
-	for i in range(cloudlets):
+	'''for i in range(cloudlets):
 		#determine importance of the cloudlet
 		scale = random()
 		#choose specs based on importance
@@ -163,12 +183,13 @@ def main():
 		if serving[i] > degs[i]:
 			procs -= serving[i] - degs[i]
 		specs.append([stor,band,procs])
-	'''specs.append([3,34,8])
-	specs.append([2,15,4])
-	specs.append([2,14,4])
-	specs.append([3,28,7])
 	'''
-	specs.append([10000,10000,10000])
+	specs.append([5,15,10])
+	specs.append([5,15,10])
+	specs.append([5,15,10])
+	specs.append([5,15,10])
+	
+	specs.append([250,250,250])
 
 	#set variables for QoS construction
 	qos = []

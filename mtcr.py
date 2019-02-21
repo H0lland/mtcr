@@ -97,13 +97,14 @@ for j in range(0,len(specs)):
 		#assume locality
 		local = 1
 		remote = 0
+		localCl = conns[user]
 		#if task is non-local
 		if(conns[user] != j):
 			#swap values
 			local = 0
 			remote = 1 
-		sumE += (local* inSize + remote * outSize)* schedule[t,j]
-	model.addConstr(sumE <= specs[j][1], "Bandwidth" + str(j))
+		sumE += (local * inSize + remote * outSize) * .001 * dists[j][localCl] * schedule[t,j]
+	model.addConstr(sumE <= float(specs[j][1]), "Bandwidth" + str(j))
 
 #Completion constraints
 model.addConstr(schedule.sum() == len(tasks),"All tasks")
@@ -121,24 +122,26 @@ for j in range(0,len(specs)):
 		ty = tasks[t][4]
 		model.addConstr(schedule[t,j] <= placing[ty,j],"Service Existance")
 
-#qos constraints
+#qos terms 
+currUser = tasks[0][0]
+taskNum = -1
 for t in range(0,len(tasks)):
 		user = tasks[t][0]
-		taskNum = t % 2
+		if user == currUser:
+			taskNum += 1
+		else:
+			taskNum = 0
+			currUser = user
 		localCl = conns[user]	
-		#for each cloudlet
-		'''
-		print(tasks[t][1] * .01 * dists[4][localCl],end="\t")
-		print(tasks[t][2] * .01 * dists[4][localCl],end="\t")
-		print(tasks[t][3],end="\t")
-		print(qos[user][taskNum])
-		'''
+		#for each cloudlet	
 		for k in range(0,len(specs)):
 			upTime = tasks[t][1] * .01 * dists[k][localCl]
 			downTime = tasks[t][2] * .01 * dists[k][localCl]
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
-			model.addConstr(tot*schedule[t,k] <= qos[user][taskNum], "QoS Constraint")
+			diff = float(qos[user][taskNum])-tot
+			model.addConstr(diff*schedule[t,j] >= 0, "QoS Constraint")
+
 
 #objective function
 obj = model.getObjective()
@@ -153,7 +156,27 @@ for j in range(0,len(specs)):
     for t in range(0,len(tasks)):
         ty = tasks[t][4]
         obj.add(schedule[t,j],schedulingCosts[j][ty])
-'''
+
+'''#qos terms 
+currUser = tasks[0][0]
+taskNum = -1
+for t in range(0,len(tasks)):
+		user = tasks[t][0]
+		if user == currUser:
+			taskNum += 1
+		else:
+			taskNum = 0
+			currUser = user
+		localCl = conns[user]	
+		#for each cloudlet	
+		for k in range(0,len(specs)):
+			upTime = tasks[t][1] * .01 * dists[k][localCl]
+			downTime = tasks[t][2] * .01 * dists[k][localCl]
+			procTime = tasks[t][3]
+			tot = upTime + float(procTime) + downTime
+			diff = float(qos[user][taskNum])-tot
+			obj.add(schedule[t,j],diff)
+
 #add communication terms
 for j in range(0,len(specs)):
 	for t in range(0,len(tasks)):
