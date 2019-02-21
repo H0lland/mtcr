@@ -35,6 +35,18 @@ vector<vector<vector<int>>> parseIn(string filename){
 	return rtn;
 }
 
+//makeServices:  Takes the listed service parameters from the input file and returns a vector of services.
+vector<service> makeServices(vector<vector<int>> params){
+	//initializations
+	vector<service> rtn;
+	for(int i = 0; i< params.size(); i+=1){
+		vector<int> curr = params.at(i);
+		//create cloudlet
+		service s(curr.at(0),curr.at(1),curr.at(2),curr.at(3),curr.at(4),curr.at(5));	
+		rtn.push_back(s);
+	}
+	return rtn;
+}
 //makeCloudlets:  Takes the listed cloudlet parameters from the input file and returns a vector of cloudlets.
 vector<cloudlet> makeCloudlets(vector<vector<int>> params){
 	//initializations
@@ -475,12 +487,7 @@ int main(int argc, char** argv){
 	cin >> fn;
 	int alpha = 2;
 	vector<vector<vector<int>>> in = parseIn(fn);
-	vector<service> servs;
-	servs.push_back(service(0,1,3,1));
-	servs.push_back(service(1,1,2,2));
-	servs.push_back(service(2,1,1,3));
-	servs.push_back(service(3,1,2,1));
-	servs.push_back(service(4,1,1,3));
+	vector<service> servs = makeServices(in.at(5));	
 	vector<cloudlet> cls = makeCloudlets(in.at(0));
 	vector<vector<int>> dists = in.at(3);
 	vector<task> tasks = makeTasks(in.at(4),servs);
