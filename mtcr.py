@@ -85,7 +85,7 @@ for j in range(0,len(specs)):
 	for t in range(0,len(tasks)):
 		sumT += tasks[t][3]*schedule[t,j]
 	model.addConstr(sumT <= specs[j][2],"Processing" + str(j))
-
+'''
 #bandwidth
 for j in range(0,len(specs)):
 	sumE = 0
@@ -105,10 +105,7 @@ for j in range(0,len(specs)):
 			remote = 1 
 		sumE += (local * inSize + remote * outSize) * .001 * dists[j][localCl] * schedule[t,j]
 	model.addConstr(sumE <= float(specs[j][1]), "Bandwidth" + str(j))
-
-#Completion constraints
-model.addConstr(schedule.sum() == len(tasks),"All tasks")
-
+'''
 #uniqueness constraints
 for t in range(0,len(tasks)):
 	sumCom = 0
@@ -135,8 +132,8 @@ for t in range(0,len(tasks)):
 		localCl = conns[user]	
 		#for each cloudlet	
 		for k in range(0,len(specs)):
-			upTime = tasks[t][1] * .01 * dists[k][localCl]
-			downTime = tasks[t][2] * .01 * dists[k][localCl]
+			upTime = tasks[t][1] * .001 * dists[k][localCl]
+			downTime = tasks[t][2] * .001 * dists[k][localCl]
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
 			diff = float(qos[user][taskNum])-tot

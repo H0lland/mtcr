@@ -60,7 +60,7 @@ def main():
 	userDists = []
 	coords = []
 	dists = []
-	cloudDist = 10
+	cloudDist = 5 
 	#set dists between users and their cloudlets
 	for i in range(len(conns)):
 		userDists.append(randrange(10,30))
@@ -172,7 +172,7 @@ def main():
 	minProcs = int(users/(cloudlets) * (maxComps - minComps)/2)
 	maxProcs = int(1.5 * minProcs)
 	specs = []
-	'''for i in range(cloudlets):
+	for i in range(cloudlets):
 		#determine importance of the cloudlet
 		scale = random()
 		#choose specs based on importance
@@ -183,13 +183,13 @@ def main():
 		if serving[i] > degs[i]:
 			procs -= serving[i] - degs[i]
 		specs.append([stor,band,procs])
-	'''
-	specs.append([5,15,10])
-	specs.append([5,15,10])
-	specs.append([5,15,10])
-	specs.append([5,15,10])
 	
-	specs.append([250,250,250])
+	#specs.append([5,15,10])
+	#specs.append([5,15,10])
+	#specs.append([5,15,10])
+	#specs.append([5,15,10])
+	
+	specs.append([10000,10000,10000])
 
 	#set variables for QoS construction
 	qos = []
