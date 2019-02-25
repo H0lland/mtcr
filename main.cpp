@@ -10,7 +10,7 @@ using namespace std;
 //ParseIn: Parses input file (must be of type .gcon) and returns the content in a 2-D vector
 vector<vector<vector<int>>> parseIn(string filename){
 	//initializations
-	ifstream readfile(filename);
+	ifstream readfile(filename+".gcon");
 	vector<vector<vector<int>>> rtn;
 	string section;
 	string line;
@@ -467,22 +467,23 @@ int costOf(vector<vector<vector<vector<int>>>> answer, vector<int> placeCosts, v
 }
 
 int main(int argc, char** argv){
-	cout << "Enter filename: " << endl;
-	string fn;
-	cin >> fn;
-	int alpha = 2;
-	cout << "Making...";
+	if(argc < 3){
+		cout << "Improper usage: ./main inFile alpha value" << endl;
+	}
+	string fn = argv[1];
+	int alpha = std::stoi(argv[2]);
+	ofstream outFile;
+	outFile.open(fn+".apx");	
 	vector<vector<vector<int>>> in = parseIn(fn);
 	vector<service> servs = makeServices(in.at(5));	
 	vector<cloudlet> cls = makeCloudlets(in.at(0));
 	vector<vector<int>> dists = in.at(3);
 	vector<task> tasks = makeTasks(in.at(4),servs);
 	vector<user> users = makeUsers(in.at(2),tasks);
-	connect(cls,users,in.at(1));
-	cout << "\nMade!" << endl;
-	cout << "Selecting...";
+	connect(cls,users,in.at(1));	
+	/*cout << "Selecting...";
 	vector<int> chosen = selectServices1(cls,servs);
-	cout << "\nSelected!" << endl;
+	cout << "\nSelected!" << endl;*/
 	/*for(int i = 0; i < chosen.size(); i++){
 		cout << chosen.at(i) << endl;
 	}*/
@@ -494,7 +495,6 @@ int main(int argc, char** argv){
 	//make schedCost vector
 	vector<vector<int>> sched;
 	for(int i = 0; i < cls.size(); i++){
-		cout << i << "...";
 		vector<int> temp;
 		for(int j = 0; j < servs.size(); j++){
 			if(i < 4){
@@ -504,27 +504,25 @@ int main(int argc, char** argv){
 				temp.push_back(servs.at(j).getSched());
 			}
 		}
-		sched.push_back(temp);
-		cout << "done!" << endl;
+		sched.push_back(temp);	
 	}
-	cout << "Answering...\n";	
 	vector<vector<vector<vector<int>>>> answer = scheduleGlobal(cls, users, dists, servs, in.at(1), 2);
-	cout << "Answered!" << endl;
+	outFile << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
 	for(int i = 0; i < answer.size(); i++){
-		cout << i << ":" << endl;
+		outFile << i << ":" << endl;
 		for(int j = 0; j < 2; j++){
 			if(j == 0)
-				cout << "placed:" << '\t';
+				outFile << "placed:" << '\t';
 			else
-				cout << "sched:" << '\t';
+				outFile << "sched:" << '\t';
 			for(int k = 0; k < answer.at(i).at(j).size(); k++){
 				for(int l = 0; l < answer.at(i).at(j).at(k).size(); l++){
-					cout << answer.at(i).at(j).at(k).at(l) << ",";
+					outFile << answer.at(i).at(j).at(k).at(l) << ",";
 				}
-				cout << ";";
+				outFile<< ";";
 			}
-			cout << endl;
+			outFile << endl;
 		}
 	}
-	cout << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
+	outFile.close();
 }

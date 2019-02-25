@@ -19,7 +19,7 @@ def main():
 		lineLst = lines[i].split(",")
 		pos = lineLst[0].rfind('-')
 		name = lineLst[0][:pos]
-
+		
 		#same name found
 		if name == curr:
 			cloud += int(lineLst[1])

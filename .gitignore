@@ -10,3 +10,5 @@ main
 *.cnt
 
 tests/
+
+*.apx
