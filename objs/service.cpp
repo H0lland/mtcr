@@ -2,9 +2,11 @@
 
 service::service(){}
 
-service::service(int k,int st,int pc,int sc){
+service::service(int k,int iS,int oS,int cp,int pc,int sc){
 	key = k;
-	stor = st;
+	inSize = iS;
+	outSize = oS;
+	comps = cp;
 	placeCost = pc;
 	schedCost = sc;
 }
