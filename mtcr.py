@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.7
+#usage: ./mtcr.py fileName
 from gurobipy import *
 from random import randrange
 import sys
@@ -6,7 +7,7 @@ import sys
 #read in from scenario file
 #inFile = input("Config name: ")
 inFile = sys.argv[1]
-beta = int(sys.argv[2])/10
+#beta = int(sys.argv[2])/10
 file = open(inFile+".gcon","r")
 lines = file.readlines()
 
@@ -44,6 +45,13 @@ for i in range(len(servs)):
     servs[i] = servs[i][:-1].split(",")
     servs[i] = list(map(int,servs[i]))
 
+#parse scheds data
+schedulingCosts = lines[6][:-2].split(";")
+for i in range(len(schedulingCosts)):
+	schedulingCosts[i] = schedulingCosts[i][:-1].split(",")
+	schedulingCosts[i] = list(map(int,schedulingCosts[i]))
+
+print(len(schedulingCosts))
 #construct storage and placement costs
 #storageCosts = [2,2,2,2,2]
 placementCosts = []
@@ -53,16 +61,16 @@ for i in range(len(specs)-1):
 	edgeSched.append([])
 for i in range(len(servs)):
 	placementCosts.append(servs[i][4])
-	cloudSched.append(servs[i][5])
+'''	cloudSched.append(servs[i][5])
 	for j in range(len(specs)-1):
 		#edgeSched[j].append(randrange(1,beta)*servs[i][5])
-		edgeSched[j].append(beta*servs[i][5])
+		#edgeSched[j].append(beta*servs[i][5])
 		
 
 #for each edge
-schedulingCosts = edgeSched.copy()
-schedulingCosts.append(cloudSched.copy())
-
+#schedulingCosts = edgeSched.copy()
+#schedulingCosts.append(cloudSched.copy())
+'''
 #create the model
 model = Model('MTCR Optimization')
 
@@ -153,7 +161,7 @@ for m in range(len(servs)):
 for j in range(0,len(specs)):
     for t in range(0,len(tasks)):
         ty = tasks[t][4]
-        obj.add(schedule[t,j],schedulingCosts[j][ty])
+        obj.add(schedule[t,j],schedulingCosts[ty][j])
 
 '''#qos terms 
 currUser = tasks[0][0]

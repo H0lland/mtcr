@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.7
-#usage: ./gen.py cloudlets users services qos out
+#usage: ./gen.py cloudlets users services qos beta out
 from random import randrange,random,uniform
 import sys
 def main():
@@ -8,7 +8,8 @@ def main():
 	users = int(sys.argv[2])	
 	servs = int(sys.argv[3])
 	qosFactor = int(sys.argv[4])/10
-	out = sys.argv[5]
+	beta = int(sys.argv[5])/10
+	out = sys.argv[6]
 	#set variables for constructing conns
 	minUsers = 1
 	maxUsers = 4 * minUsers
@@ -140,6 +141,19 @@ def main():
 		tmp.append(randrange(minPlace,maxPlace))
 		tmp.append(randrange(minSched,maxSched))
 		servLst.append(tmp)
+	
+	#initialize variables for scheudling matrix construction
+	scheds = []
+	#construct scheds matrix
+	for i in range(servs):
+		tmp = []
+		for j in range(cloudlets+1):
+			#scheduling on an edge
+			if j < (cloudlets):
+				tmp.append(randrange(1,beta) * servLst[i][5])
+			else:
+				tmp.append(servLst[i][5])
+		scheds.append(tmp)
 
 	#set service variables for tasks construction
 	#inSizes = [40,60,80,60,40]
@@ -246,6 +260,12 @@ def main():
 			file.write(str(servLst[i][j])+",")
 		file.write(";")
 	file.write("\n")
-
+	
+	#write scheds
+	for i in range(len(scheds)):
+		for j in range(len(scheds[i])):
+			file.write(str(scheds[i][j])+",")
+		file.write(";")
+	file.write("\n")
 	file.close()
 main()
