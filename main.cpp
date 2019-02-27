@@ -456,7 +456,7 @@ int costOf(vector<vector<vector<vector<int>>>> answer, vector<int> placeCosts, v
 						if(l == 1){
 							int currU = answer.at(i).at(j).at(k).at(0);
 							int serv = users.at(currU).getTasks().at(val).getType().getKey();
-							cost += schedCosts.at(i).at(serv);
+							cost += schedCosts.at(serv).at(i);
 						}
 					}
 				}
@@ -491,10 +491,19 @@ int main(int argc, char** argv){
 	vector<int> place;	
 	for(int i = 0; i < servs.size(); i++){
 		place.push_back(servs.at(i).getPlace());
+		cout << place.at(i) << " ";
 	}
+	cout << "\n";
 	//make schedCost vector
-	vector<vector<int>> sched;
-	for(int i = 0; i < cls.size(); i++){
+	vector<vector<int>> sched = in.at(6);
+	cout << sched.size() << endl;
+	for(int i = 0; i < sched.size(); i++){
+		for(int j = 0; j < sched.at(i).size(); j++){
+			cout << sched.at(i).at(j) << " ";
+		}
+		cout << "\n";
+	}
+	/*for(int i = 0; i < cls.size(); i++){
 		vector<int> temp;
 		for(int j = 0; j < servs.size(); j++){
 			#if a cloudlet
@@ -506,7 +515,7 @@ int main(int argc, char** argv){
 			}
 		}
 		sched.push_back(temp);	
-	}
+	}*/
 	vector<vector<vector<vector<int>>>> answer = scheduleGlobal(cls, users, dists, servs, in.at(1), beta);
 	outFile << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
 	for(int i = 0; i < answer.size(); i++){
