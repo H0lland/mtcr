@@ -7,11 +7,19 @@ def main():
 	inFile = open(inName+".sol","r")
 	lines = inFile.readlines()
 	inFile.close()
+	apxFile = open(inName+".apx","r")
+	apxLines = apxFile.readlines()
+	apxFile.close()
+	algCost = int(apxLines[0].split(":")[1])
 
 	#count the number of schedule placements and the number placed on the cloud
 	cloudCnt = 0
 	schedCnt = 0
+	cost = 0
 	for i in range(len(lines)-1):
+		#get objective value
+		if i == 1:
+			cost = int(lines[i].split("=")[1])
 		line = lines[i].split()
 		#check that this variable was set to 1
 		if line[1] == "1":
@@ -26,7 +34,7 @@ def main():
 
 	#append data
 	outFile = open(str(outName)+".csv","a+")	
-	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+"\n")
+	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(algCost)+"\n")
 	outFile.close()
 
 main()

@@ -35,7 +35,7 @@ def main():
 			curr = name
 			cloud = int(lineLst[1])
 			sched = int(lineLst[2])
-	
+	vals.append([curr,edgePerc,cloudPerc])	
 	#write the data
 	outFile = open(inName+"_avg.csv","w")
 	for i in range(len(vals)):

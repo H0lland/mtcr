@@ -55,8 +55,9 @@ for i in range(len(servs)):
 	placementCosts.append(servs[i][4])
 	cloudSched.append(servs[i][5])
 	for j in range(len(specs)-1):
-		edgeSched[j].append(randrange(1,beta)*servs[i][5])
-
+		#edgeSched[j].append(randrange(1,beta)*servs[i][5])
+		edgeSched[j].append(beta*servs[i][5])
+		
 
 #for each edge
 schedulingCosts = edgeSched.copy()

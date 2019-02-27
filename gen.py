@@ -119,16 +119,16 @@ def main():
 	minSched = 1
 	maxSched = 5
 	'''	
-	minIn = 1
-	maxIn = 2
-	minOut = 1
-	maxOut = 2
-	minComps = 1
-	maxComps = 2
-	minPlace = 1
-	maxPlace = 2
-	minSched = 1
-	maxSched = 2
+	minIn = 2
+	maxIn = 4
+	minOut = 2
+	maxOut = 4
+	minComps = 2
+	maxComps = 4
+	minPlace = 2
+	maxPlace = 4
+	minSched = 2
+	maxSched = 4
 	#construct servs
 	for i in range(servs):
 		tmp = []

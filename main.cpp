@@ -471,7 +471,7 @@ int main(int argc, char** argv){
 		cout << "Improper usage: ./main inFile alpha value" << endl;
 	}
 	string fn = argv[1];
-	int alpha = std::stoi(argv[2]);
+	int beta = std::stoi(argv[2]);
 	ofstream outFile;
 	outFile.open(fn+".apx");	
 	vector<vector<vector<int>>> in = parseIn(fn);
@@ -497,8 +497,9 @@ int main(int argc, char** argv){
 	for(int i = 0; i < cls.size(); i++){
 		vector<int> temp;
 		for(int j = 0; j < servs.size(); j++){
-			if(i < 4){
-				temp.push_back(alpha * servs.at(j).getSched());
+			#if a cloudlet
+			if(i < cls.size()-1){
+				temp.push_back(beta * servs.at(j).getSched());
 			}
 			else{
 				temp.push_back(servs.at(j).getSched());
@@ -506,7 +507,7 @@ int main(int argc, char** argv){
 		}
 		sched.push_back(temp);	
 	}
-	vector<vector<vector<vector<int>>>> answer = scheduleGlobal(cls, users, dists, servs, in.at(1), 2);
+	vector<vector<vector<vector<int>>>> answer = scheduleGlobal(cls, users, dists, servs, in.at(1), beta);
 	outFile << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
 	for(int i = 0; i < answer.size(); i++){
 		outFile << i << ":" << endl;
