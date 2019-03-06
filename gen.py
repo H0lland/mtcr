@@ -214,7 +214,7 @@ def main():
 			#if task is assigned to user i
 			if tasks[j][0] == i:
 				#append qosFactor times the computation time for qos
-				tmp.append(qosFactor*tasks[j][3])
+				tmp.append(round(qosFactor*tasks[j][3]))
 		qos.append(tmp)
 
 

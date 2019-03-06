@@ -107,14 +107,16 @@ vector<task> makeTasks(vector<vector<int>> params, vector<service> servs){
 //Servible: determine if a task is servible by a cloudlet (assuming the proper service is placed on that cloudlet
 bool servible(int pos, user U, cloudlet cl, vector<vector<int>> dists, vector<vector<int>> conns){
 	//initializations
-	bool servible = 1;	
+	bool flag = false;
+	bool servi = 1;	
 	task tas = U.getTasks().at(pos);
 	service serv = tas.getType();
 	int key = U.getKey();		
 	int local = conns.at(0).at(key);	
 	vector<user> users = cl.getUsers();
+	
 	if(tas.getComp() > cl.getRemProcs()){ //task requires more processing than cloudlet has
-		servible = 0;
+		servi = 0;
 	}	
 	/*if(not local && servible){ //if not local and still servible check
 		//task requires more band than cloudlet has
@@ -128,89 +130,19 @@ bool servible(int pos, user U, cloudlet cl, vector<vector<int>> dists, vector<ve
 			servible = 0;
 		}
 	}*/
-	if(servible){
+	if(servi){
 		//if task cannot be completed in time
 		double dist = double(dists.at(local).at(cl.getKey()));
 		double up = tas.getIn() * .001 * dist;
 		double down = tas.getOut() * .001 * dist;
 		double total = up + down + tas.getComp();
 		if(total > U.getQos().at(pos)){
-			servible = 0;
+			servi = 0;
 		}
 	}
-	return servible;
-}
-/*
-//Greedy Local Algorithm 1: pick tasks by tasks/storage metric
-int nextService1(cloudlet cl, int numSer, int stor[]){
-	int buckets[numSer];
-	int remain = cl.getRemStor(); 
-	//initialize buckets
-	for(int i = 0; i < numSer; i++){
-		buckets[i] = 0;
-	}
-	vector<int> servs = cl.getServs();
-	vector<user> users = cl.getUsers();
-	//count occurences for each service
-	for(int j = 0; j < users.size(); j++){
-		vector<task> tasks = users.at(j).getTasks();
-		for(int k = 0; k < tasks.size(); k++){
-			service serv = tasks.at(k).getType();
-			buckets[serv-1]++;
-		}
-	}
-	float max = 0;
-	int pos = 0;
-	//pick the next service needed
-	for(int i = 0; i < numSer; i++){
-		float profit = buckets[i]/stor[i]; //determine profit as tasks over cost
-		if(profit > max && stor[i] <= remain){
-			max = profit;
-			pos = i;
-		}
-	}
-	return (pos+1);
+	return servi;
 }
 
-//Greedy Local Algorithm 2: pick tasks by num users served/storage metric
-int nextService2(cloudlet cl, int numSer, int stor[]){
-	int buckets[numSer];
-	int remain = cl.getRemStor();
-	//initialize buckets
-	for(int i = 0; i < numSer; i++){
-		buckets[i] = 0;
-	}
-	vector<int> servs = cl.getServs();
-	vector<user> users = cl.getUsers();
-	//count occurences for each service
-	for(int j = 0; j < users.size(); j++){
-		vector<task> tasks = users.at(j).getTasks();
-		int tempArr [numSer];
-		//make a temp array for each user
-		for(int k = 0; k < numSer; k++){
-			tempArr[k]=0;
-		}
-		for(int k = 0; k < tasks.size(); k++){
-			int serv = tasks.at(k).getType();
-			tempArr[serv-1]=1;
-		}
-		for(int k = 0; k < numSer; k++){
-			buckets[k] += tempArr[k];
-		}
-	}
-	float max = 0;
-	int pos = 0;
-	//pick the next service needed
-	for(int i = 0; i < numSer; i++){
-		float profit = buckets[i]/stor[i]; //determine profit as tasks over cost
-		if(profit > max && stor[i] <= remain){
-			max = profit;
-			pos = i;
-		}
-	}
-	return (pos+1);
-}
-*/
 //maxElement: returns max int in a vector of ints excluding the last element
 int maxElement(vector<double> vec){
 	int max = 0;
@@ -220,6 +152,17 @@ int maxElement(vector<double> vec){
 		}
 	}	
 	return max;
+}
+
+//maxElement: returns max int in a vector of ints excluding the last element
+int minElement(vector<int> vec){
+	int min = 0;
+	for(int i = 1; i< vec.size(); i++){
+		if(vec.at(i) < vec.at(min)){
+			min = i;
+		}
+	}	
+	return min;
 }
 
 //Meh
@@ -279,8 +222,8 @@ std::vector<int> selectServices1(vector<cloudlet> cls, vector<service> servs){
 	return rtn;
 }
 
-//scheduleGlobalR: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
-vector<vector<vector<vector<int>>>> scheduleGlobalR(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<vector<int>> conns, int alpha){
+//scheduleLocal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
+vector<vector<vector<vector<int>>>> scheduleLocal(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<vector<int>> conns, int alpha){
 	//initializations
 	vector<vector<vector<vector<int>>>> rtn;
 	//create a 2d vec for each cloudlet
@@ -290,49 +233,69 @@ vector<vector<vector<vector<int>>>> scheduleGlobalR(vector<cloudlet> cls, vector
 	}
 	//create a 2d vec for the status of each task
 	vector<vector<bool>> scheded;
+	int remTasks = 0;
 	for(int i =0; i < users.size(); i++){
 		vector<bool> temp;
 		for(int j = 0; j < users.at(i).getTasks().size(); j++){
 			temp.push_back(false);
+			remTasks += 1;
 		}
 		scheded.push_back(temp);
 	}	
-	//for each service
-	for(int i = 0; i < servs.size(); i++){	
-		vector<vector<vector<int>>> tasks;
-		//randomly place on a cloudlet
-		int j = rand() % 5;
-		//randomly reroll until you find a valid placement
-		while(cls.at(j).getRemStor() < servs.at(i).getPlace()){
-			j = rand() % 5;
-		}
-		vector<vector<int>> jTasks;
-		cls.at(j).reduceStor(servs.at(i).getPlace());
-		//for each user
-		for(int k = 0; k < users.size(); k++){
-			//for each of that user's tasks
-			for(int l = 0; l < users.at(k).getTasks().size(); l++){	
-				//if the task hasn't been scheduled and is of type i
-				if(!scheded.at(k).at(l)&&users.at(k).getTasks().at(l).getType()==servs.at(i)){
-					//if the task is servible by cloudlet
-					if(servible(l, users.at(k), cls.at(j),dists,conns)){	
-						//add profit
-						vector<int> t{ k, l};
-						jTasks.push_back(t);	
-						cls.at(j).reduceProcs(users.at(k).getTasks().at(l).getComp());
-					}
+	//for each cloudlet
+	for(int j = 0; j < cls.size() - 1; j++){
+		cout << j << endl;
+		vector<user> conned = cls.at(j).getUsers();
+		vector<int> qoses;
+		vector<int> indexes;
+		int iter = 0;
+			if (j==3){
+				cout << "253" <<  endl;
+			}
+		//while you still have things
+		while(cls.at(j).getRemStor() * cls.at(j).getRemProcs() > 0 && iter < 5){
+			iter += 1;
+			for(int k = 0; k < conned.size(); k++){
+				//for each of that user's tasks
+				for(int l = 0; l < conned.at(k).getTasks().size(); l++){	
+					//if the task hasn't been scheduled
+						int qos = conned.at(k).getQos().at(l);
+						if (!scheded.at(conned.at(k).getKey()).at(l)){
+							indexes.push_back(conned.at(k).getKey());
+							qoses.push_back(qos);
+						}
 				}
 			}
-		}	
-		//add the service and tasks to that cloudlet's lists
-		tasks.push_back(jTasks);
-		vector<int> s;
-		int chosen = j;
-		s.push_back(servs.at(i).getKey());		
-		rtn.at(chosen).at(0).push_back(s);	
-		for(int x = 0; x < jTasks.size(); x++){
-			rtn.at(chosen).at(1).push_back(jTasks.at(x));
-		}	
+			//get tightest qos conned to cloudlet j
+			int chosen = minElement(qoses);
+			if (j==3){
+				cout << chosen <<  endl;
+			}
+			user u = users.at(indexes.at(chosen));
+			int serv = u.getTasks().at(0).getType().getKey();
+			cls.at(j).reduceStor(servs.at(serv).getPlace());
+			vector<int> s;
+			s.push_back(servs.at(serv).getKey());
+			rtn.at(j).at(0).push_back(s);
+			rtn.at(j).at(1).push_back({u.getKey(),0});
+			cls.at(j).reduceProcs(users.at(u.getKey()).getTasks().at(0).getComp());
+			scheded.at(u.getKey()).at(0) = true;
+		}
+	}
+	int cloud = cls.size()-1;
+	for(int k = 0; k < users.size(); k++){
+		for(int l = 0; l < users.at(k).getTasks().size(); l++){
+			if(!scheded.at(k).at(l)){
+				int serv = users.at(k).getTasks().at(l).getType().getKey();	
+				cls.at(cloud).reduceStor(servs.at(serv).getPlace());
+				vector<int> s;	
+				s.push_back(servs.at(serv).getKey());
+				rtn.at(cloud).at(0).push_back(s);
+				rtn.at(cloud).at(1).push_back({k,0});
+				cls.at(cloud).reduceProcs(users.at(k).getTasks().at(l).getComp());
+				scheded.at(users.at(k).getKey()).at(0) = true;
+			}
+		}
 	}
 	return rtn;
 }
@@ -348,57 +311,73 @@ vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<
 	}
 	//create a 2d vec for the status of each task
 	vector<vector<bool>> scheded;
+	int remTasks = 0;
 	for(int i =0; i < users.size(); i++){
 		vector<bool> temp;
 		for(int j = 0; j < users.at(i).getTasks().size(); j++){
 			temp.push_back(false);
+			remTasks += 1;
 		}
 		scheded.push_back(temp);
-	}
-	//for each service
-	for(int i = 0; i < servs.size(); i++){
-		vector<double> profits;
-		vector<vector<vector<int>>> tasks;	
-		//for each cloudlet
-		for(int j = 0; j < cls.size(); j++){		
-			double prof = 0;
-			vector<vector<int>> jTasks;
-			//for each user
-			for(int k = 0; k < users.size(); k++){
-				//for each of that user's tasks
-				for(int l = 0; l < users.at(k).getTasks().size(); l++){	
-					//if the task hasn't been scheduled and is of type i
-					if(!scheded.at(k).at(l)&&users.at(k).getTasks().at(l).getType()==servs.at(i)){	
-						//if the task is servible by cloudlet
-						if(servible(l, users.at(k), cls.at(j),dists, conns)){	
-							//add profit
-							prof += 1;
-							vector<int> t{ k, l};
-							jTasks.push_back(t);	
+	}	
+	//while there's remaining tasks
+	int iter = 0;
+	while (remTasks > 0 && iter < 10){	
+		iter += 1;
+		for(int k = 0; k < users.size(); k++){
+			//for each of that user's tasks
+			for(int l = 0; l < users.at(k).getTasks().size(); l++){	
+				//if the task hasn't been scheduled
+				if(!scheded.at(k).at(l)){	
+					vector<double> profits;
+					vector<vector<vector<int>>> tasks;
+					int i = users.at(k).getTasks().at(l).getType().getKey();
+					//for each cloudlet
+					for(int j = 0; j < cls.size(); j++){		
+						double prof = 0;
+						vector<vector<int>> jTasks;
+						//for each user
+						for(int kPri = k; kPri < users.size(); kPri++){
+							for(int lPri = l; lPri < users.at(kPri).getTasks().size(); lPri++){
+								//if the task hasn't been scheduled and is of type i
+								if(!scheded.at(kPri).at(lPri)&&users.at(kPri).getTasks().at(lPri).getType()==servs.at(i)){	
+									//if the task is servible by cloudlet
+									if(servible(l, users.at(k), cls.at(j),dists, conns)){	
+										//add profit
+										prof += 1;
+										vector<int> t{ k, l};
+										jTasks.push_back(t);	
+									}
+								}
+							}
+						}	
+						tasks.push_back(jTasks);
+						//factor in remaining storage (push to cloud if you can)
+						prof = prof * cls.at(j).getRemStor()*cls.at(j).getRemProcs();
+						//if on cloudlet, consider alpha cost
+						if(j < cls.size()-1){
+							prof = prof / alpha;
 						}
+						profits.push_back(prof);	
 					}	
+					//choose largest
+					int chosen = maxElement(profits);	
+					//add the service and tasks to that cloudlet's lists
+					if(profits.at(chosen) > 0){
+						vector<int> s;
+						cls.at(chosen).reduceStor(servs.at(i).getPlace());
+						s.push_back(servs.at(i).getKey());		
+						rtn.at(chosen).at(0).push_back(s);	
+						for(int x = 0; x < tasks.at(chosen).size(); x++){	
+							rtn.at(chosen).at(1).push_back(tasks.at(chosen).at(x));	
+							int U = tasks.at(chosen).at(x).at(0);
+							int pos = tasks.at(chosen).at(x).at(1);	
+							cls.at(chosen).reduceProcs(users.at(U).getTasks().at(pos).getComp());
+							scheded.at(U).at(pos) = true;
+							remTasks -= 1;
+						}
+					}
 				}
-			}	
-			tasks.push_back(jTasks);
-			//if on cloudlet, consider alpha cost
-			if(j < 4){
-				prof = prof / alpha;
-			}
-			profits.push_back(prof);	
-		}	
-		//choose largest
-		int chosen = maxElement(profits);	
-		//add the service and tasks to that cloudlet's lists
-		if(profits.at(chosen) > 0){
-			vector<int> s;
-			cls.at(chosen).reduceStor(servs.at(i).getPlace());
-			s.push_back(servs.at(i).getKey());		
-			rtn.at(chosen).at(0).push_back(s);	
-			for(int x = 0; x < tasks.at(chosen).size(); x++){	
-				rtn.at(chosen).at(1).push_back(tasks.at(chosen).at(x));	
-				int U = tasks.at(chosen).at(x).at(0);
-				int pos = tasks.at(chosen).at(x).at(1);	
-				cls.at(chosen).reduceProcs(users.at(U).getTasks().at(pos).getComp());
 			}
 		}
 	}
@@ -471,10 +450,10 @@ int main(int argc, char** argv){
 		cout << "Improper usage: ./main inFile alpha value" << endl;
 	}
 	string fn = argv[1];
-	int beta = std::stoi(argv[2]);
+	int beta = std::stoi(argv[2])/10;
 	ofstream outFile;
 	outFile.open(fn+".apx");	
-	vector<vector<vector<int>>> in = parseIn(fn);
+	vector<vector<vector<int>>> in = parseIn(fn);	
 	vector<service> servs = makeServices(in.at(5));	
 	vector<cloudlet> cls = makeCloudlets(in.at(0));
 	vector<vector<int>> dists = in.at(3);
@@ -491,18 +470,9 @@ int main(int argc, char** argv){
 	vector<int> place;	
 	for(int i = 0; i < servs.size(); i++){
 		place.push_back(servs.at(i).getPlace());
-		cout << place.at(i) << " ";
 	}
-	cout << "\n";
 	//make schedCost vector
 	vector<vector<int>> sched = in.at(6);
-	cout << sched.size() << endl;
-	for(int i = 0; i < sched.size(); i++){
-		for(int j = 0; j < sched.at(i).size(); j++){
-			cout << sched.at(i).at(j) << " ";
-		}
-		cout << "\n";
-	}
 	/*for(int i = 0; i < cls.size(); i++){
 		vector<int> temp;
 		for(int j = 0; j < servs.size(); j++){
@@ -535,4 +505,22 @@ int main(int argc, char** argv){
 		}
 	}
 	outFile.close();
+	vector<vector<vector<vector<int>>>> answer2 = scheduleLocal(cls, users, dists, servs, in.at(1), beta);
+	cout << "Algorithm Cost: " << costOf(answer2, place, sched,  users) << endl;
+	for(int i = 0; i < answer2.size(); i++){
+		cout << i << ":" << endl;
+		for(int j = 0; j < 2; j++){
+			if(j == 0)
+				cout << "placed:" << '\t';
+			else
+				cout << "sched:" << '\t';
+			for(int k = 0; k < answer2.at(i).at(j).size(); k++){
+				for(int l = 0; l < answer2.at(i).at(j).at(k).size(); l++){
+					cout << answer2.at(i).at(j).at(k).at(l) << ",";
+				}
+				cout<< ";";
+			}
+			cout << endl;
+		}
+	}
 }

@@ -146,6 +146,8 @@ for t in range(0,len(tasks)):
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
 			diff = float(qos[user][taskNum])-tot
+			if(t == 1 and k == 4):
+				print("flag:",tot,qos[user][taskNum],diff)
 			model.addConstr(diff*schedule[t,j] >= 0, "QoS Constraint")
 
 

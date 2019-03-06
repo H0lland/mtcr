@@ -15,13 +15,13 @@ until [ $num -gt $2 ]; do
 	echo -ne "${num}\t"
 	until [ "${counter}" = "${4}" ]; do	
 		echo -ne "${counter} "
-		./gen.py 4 $num $servs $qos $beta "${str}${num}-${beta}-${counter}"
-		./mtcr.py "${str}${num}-${beta}-${counter}" 
+		./gen.py 4 $num $servs $qos $beta "${str}${num}-${beta}-${counter}" &> trash.log
+		./mtcr.py "${str}${num}-${beta}-${counter}" &> trash.log
 		
 		if [ -e "${str}${num}-${beta}-${counter}.sol" ]
 		then
-			./main "${str}${num}-${beta}-${counter}" $beta
-			./scrape.py "${str}${num}-${beta}-${counter}" ${out} #&> trash.log	
+			./main "${str}${num}-${beta}-${counter}" $beta &> trash.log
+			./scrape.py "${str}${num}-${beta}-${counter}" ${out} &> trash.log	
 		fi
 		let counter+=1 	
 	done
