@@ -247,8 +247,8 @@ vector<vector<vector<vector<int>>>> scheduleLocal(vector<cloudlet> cls, vector<u
 		cout << j << endl;
 		vector<user> conned = cls.at(j).getUsers();
 		int iter = 0;
-		//while you still have things
-		while(cls.at(j).getRemStor() * cls.at(j).getRemProcs() > 0 && iter < 5){
+		//while you still have resources and haven't checked all conned tasks
+		while(cls.at(j).getRemStor() * cls.at(j).getRemProcs() > 0 && iter < conned.size()){
 			iter += 1;
 			vector<int> qoses;
 			vector<int> indexes;

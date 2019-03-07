@@ -21,7 +21,7 @@ until [ $beta -gt 80 ]; do
 		if [ -e "${str}${num}-${beta}-${counter}.sol" ]
 		then
 			./main "${str}${num}-${beta}-${counter}" $beta &> trash.log
-			./scrape.py "${str}${num}-${beta}-${counter}" ${out} #&> trash.log	
+			./scrape.py "${str}${num}-${beta}-${counter}" ${out} &> trash.log	
 		fi
 		let counter+=1 	
 	done
