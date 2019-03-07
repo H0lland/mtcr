@@ -336,10 +336,10 @@ vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<
 								//if the task hasn't been scheduled and is of type i
 								if(!scheded.at(kPri).at(lPri) && users.at(kPri).getTasks().at(lPri).getType()==servs.at(i)){	
 									//if the task is servible by cloudlet
-									if(servible(l, users.at(k), cls.at(j),dists, conns)){	
+									if(servible(lPri, users.at(kPri), cls.at(j),dists, conns)){	
 										//add profit
 										prof += 1;
-										vector<int> t{ k, l};
+										vector<int> t{ kPri, lPri};
 										jTasks.push_back(t);	
 									}
 								}
