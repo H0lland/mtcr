@@ -7,10 +7,15 @@ def main():
 	inFile = open(inName+".sol","r")
 	lines = inFile.readlines()
 	inFile.close()
-	apxFile = open(inName+".apx","r")
-	apxLines = apxFile.readlines()
-	apxFile.close()
-	algCost = int(apxLines[0].split(":")[1])
+	gapxFile = open(inName+".gapx","r")
+	gapxLines = gapxFile.readlines()
+	gapxFile.close()
+	galgCost = int(gapxLines[0].split(":")[1])
+	
+	lapxFile = open(inName+".lapx","r")
+	lapxLines = lapxFile.readlines()
+	lapxFile.close()
+	lalgCost = int(lapxLines[0].split(":")[1])
 
 	#count the number of schedule placements and the number placed on the cloud
 	cloudCnt = 0
@@ -34,7 +39,7 @@ def main():
 
 	#append data
 	outFile = open(str(outName)+".csv","a+")	
-	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(algCost)+"\n")
+	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(galgCost)+","+str(lalgCost)+"\n")
 	outFile.close()
 
 main()

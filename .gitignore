@@ -12,3 +12,7 @@ main
 tests/
 
 *.apx
+
+*.gapx
+
+*.lapx

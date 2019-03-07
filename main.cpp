@@ -246,15 +246,12 @@ vector<vector<vector<vector<int>>>> scheduleLocal(vector<cloudlet> cls, vector<u
 	for(int j = 0; j < cls.size() - 1; j++){
 		cout << j << endl;
 		vector<user> conned = cls.at(j).getUsers();
-		vector<int> qoses;
-		vector<int> indexes;
 		int iter = 0;
-			if (j==3){
-				cout << "253" <<  endl;
-			}
 		//while you still have things
 		while(cls.at(j).getRemStor() * cls.at(j).getRemProcs() > 0 && iter < 5){
 			iter += 1;
+			vector<int> qoses;
+			vector<int> indexes;
 			for(int k = 0; k < conned.size(); k++){
 				//for each of that user's tasks
 				for(int l = 0; l < conned.at(k).getTasks().size(); l++){	
@@ -268,9 +265,6 @@ vector<vector<vector<vector<int>>>> scheduleLocal(vector<cloudlet> cls, vector<u
 			}
 			//get tightest qos conned to cloudlet j
 			int chosen = minElement(qoses);
-			if (j==3){
-				cout << chosen <<  endl;
-			}
 			user u = users.at(indexes.at(chosen));
 			int serv = u.getTasks().at(0).getType().getKey();
 			cls.at(j).reduceStor(servs.at(serv).getPlace());
@@ -340,7 +334,7 @@ vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<
 						for(int kPri = k; kPri < users.size(); kPri++){
 							for(int lPri = l; lPri < users.at(kPri).getTasks().size(); lPri++){
 								//if the task hasn't been scheduled and is of type i
-								if(!scheded.at(kPri).at(lPri)&&users.at(kPri).getTasks().at(lPri).getType()==servs.at(i)){	
+								if(!scheded.at(kPri).at(lPri) && users.at(kPri).getTasks().at(lPri).getType()==servs.at(i)){	
 									//if the task is servible by cloudlet
 									if(servible(l, users.at(k), cls.at(j),dists, conns)){	
 										//add profit
@@ -451,8 +445,10 @@ int main(int argc, char** argv){
 	}
 	string fn = argv[1];
 	int beta = std::stoi(argv[2])/10;
-	ofstream outFile;
-	outFile.open(fn+".apx");	
+	ofstream outFile1;
+	ofstream outFile2;
+	outFile1.open(fn+".gapx");	
+	outFile2.open(fn+".lapx");
 	vector<vector<vector<int>>> in = parseIn(fn);	
 	vector<service> servs = makeServices(in.at(5));	
 	vector<cloudlet> cls = makeCloudlets(in.at(0));
@@ -487,40 +483,40 @@ int main(int argc, char** argv){
 		sched.push_back(temp);	
 	}*/
 	vector<vector<vector<vector<int>>>> answer = scheduleGlobal(cls, users, dists, servs, in.at(1), beta);
-	outFile << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
+	outFile1 << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
 	for(int i = 0; i < answer.size(); i++){
-		outFile << i << ":" << endl;
+		outFile1 << i << ":" << endl;
 		for(int j = 0; j < 2; j++){
 			if(j == 0)
-				outFile << "placed:" << '\t';
+				outFile1 << "placed:" << '\t';
 			else
-				outFile << "sched:" << '\t';
+				outFile1 << "sched:" << '\t';
 			for(int k = 0; k < answer.at(i).at(j).size(); k++){
 				for(int l = 0; l < answer.at(i).at(j).at(k).size(); l++){
-					outFile << answer.at(i).at(j).at(k).at(l) << ",";
+					outFile1 << answer.at(i).at(j).at(k).at(l) << ",";
 				}
-				outFile<< ";";
+				outFile1 << ";";
 			}
-			outFile << endl;
+			outFile1 << endl;
 		}
 	}
-	outFile.close();
+	outFile1.close();
 	vector<vector<vector<vector<int>>>> answer2 = scheduleLocal(cls, users, dists, servs, in.at(1), beta);
-	cout << "Algorithm Cost: " << costOf(answer2, place, sched,  users) << endl;
+	outFile2<< "Algorithm Cost: " << costOf(answer2, place, sched,  users) << endl;
 	for(int i = 0; i < answer2.size(); i++){
-		cout << i << ":" << endl;
+		outFile2 << i << ":" << endl;
 		for(int j = 0; j < 2; j++){
 			if(j == 0)
-				cout << "placed:" << '\t';
+				outFile2 << "placed:" << '\t';
 			else
-				cout << "sched:" << '\t';
+				outFile2 << "sched:" << '\t';
 			for(int k = 0; k < answer2.at(i).at(j).size(); k++){
 				for(int l = 0; l < answer2.at(i).at(j).at(k).size(); l++){
-					cout << answer2.at(i).at(j).at(k).at(l) << ",";
+					outFile2 << answer2.at(i).at(j).at(k).at(l) << ",";
 				}
-				cout<< ";";
+				outFile2 << ";";
 			}
-			cout << endl;
+			outFile2 << endl;
 		}
 	}
 }
