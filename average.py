@@ -9,11 +9,12 @@ def main():
 
 	#initialize
 	vals = []
-	vals.append(["num","edge%","cloud%", "optimal", "Galgorithm","Lalgorithm"])
+	vals.append(["num","edge%","cloud%", "optimal", "qOpt", "Galgorithm","Lalgorithm"])
 	curr = ''
 	sched = 1
 	cloud = 1
 	opt = 0
+	qopt = 0
 	galg = 0
 	lalg = 0
 	ct = 1
@@ -28,8 +29,9 @@ def main():
 			cloud += int(lineLst[1])
 			sched += int(lineLst[2])
 			opt += int(lineLst[3])
-			galg += int(lineLst[4])
-			lalg += int(lineLst[5])
+			qopt += int(lineLst[4])
+			galg += int(lineLst[5])
+			lalg += int(lineLst[6])
 			ct += 1
 
 		#else, total averages and start over
@@ -38,21 +40,24 @@ def main():
 			cloudPerc = cloud/sched
 			edgePerc = 1 - cloudPerc
 			opt /= ct
+			qopt /= ct
 			galg /= ct
 			lalg /= ct
-			vals.append([curr,edgePerc,cloudPerc, opt, galg,lalg])
+			vals.append([curr,edgePerc,cloudPerc, opt, qopt, galg,lalg])
 			#reset
 			curr = name
 			cloud = int(lineLst[1])
 			sched = int(lineLst[2])
 			opt = int(lineLst[3])
-			galg = int(lineLst[4])
-			lalg = int(lineLst[5])
+			qopt = int(lineLst[4])
+			galg = int(lineLst[5])
+			lalg = int(lineLst[6])
 			ct = 1
-	vals.append([curr,edgePerc,cloudPerc,opt/ct,galg/ct,lalg/ct])	
+
+	vals.append([curr,edgePerc,cloudPerc,opt/ct,qopt/ct,galg/ct,lalg/ct])	
 	#write the data
 	outFile = open(inName+"_avg.csv","w")
 	for i in range(len(vals)):
-		outFile.write(str(vals[i][0])+","+str(vals[i][1])+","+str(vals[i][2])+","+str(vals[i][3])+","+str(vals[i][4])+","+str(vals[i][5])+"\n")
+		outFile.write(str(vals[i][0])+","+str(vals[i][1])+","+str(vals[i][2])+","+str(vals[i][3])+","+str(vals[i][4])+","+str(vals[i][5])+str(vals[i][6])+"\n")
 	outFile.close()
 main()

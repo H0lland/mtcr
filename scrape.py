@@ -7,6 +7,12 @@ def main():
 	inFile = open(inName+".sol","r")
 	lines = inFile.readlines()
 	inFile.close()
+	
+	inFile = open(inName+".qsol","r")
+	lines2 = inFile.readlines()
+	inFile.close()
+	qCost = int(lines2[1].split("=")[1])
+
 	gapxFile = open(inName+".gapx","r")
 	gapxLines = gapxFile.readlines()
 	gapxFile.close()
@@ -39,7 +45,7 @@ def main():
 
 	#append data
 	outFile = open(str(outName)+".csv","a+")	
-	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(galgCost)+","+str(lalgCost)+"\n")
+	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(qCost)+","+str(galgCost)+","+str(lalgCost)+"\n")
 	outFile.close()
 
 main()
