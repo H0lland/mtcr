@@ -201,7 +201,7 @@ for t in range(0,len(tasks)):
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
 			diff = float(qos[user][taskNum])-tot
-			if diff*schedule[t,j].X == 1:
+			if schedule[t,k].X != 0.0 and diff > 0:	
 				served  += 1
 
 #print variables
