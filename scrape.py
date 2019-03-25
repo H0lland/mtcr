@@ -7,17 +7,18 @@ def main():
 	inFile = open(inName+".sol","r")
 	lines = inFile.readlines()
 	inFile.close()
-	
+
 	inFile = open(inName+".qsol","r")
 	lines2 = inFile.readlines()
 	inFile.close()
-	qCost = int(lines2[1].split("=")[1])
+	qLine = lines2[-1].split()
+	qCost = qLine[0]/qLine[1]
 
 	gapxFile = open(inName+".gapx","r")
 	gapxLines = gapxFile.readlines()
 	gapxFile.close()
 	galgCost = int(gapxLines[0].split(":")[1])
-	
+
 	lapxFile = open(inName+".lapx","r")
 	lapxLines = lapxFile.readlines()
 	lapxFile.close()
@@ -44,7 +45,7 @@ def main():
 					cloudCnt += 1
 
 	#append data
-	outFile = open(str(outName)+".csv","a+")	
+	outFile = open(str(outName)+".csv","a+")
 	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(qCost)+","+str(galgCost)+","+str(lalgCost)+"\n")
 	outFile.close()
 

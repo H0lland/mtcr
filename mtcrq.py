@@ -65,7 +65,7 @@ for i in range(len(servs)):
 	for j in range(len(specs)-1):
 		#edgeSched[j].append(randrange(1,beta)*servs[i][5])
 		#edgeSched[j].append(beta*servs[i][5])
-		
+
 
 #for each edge
 #schedulingCosts = edgeSched.copy()
@@ -111,7 +111,7 @@ for j in range(0,len(specs)):
 		if(conns[user] != j):
 			#swap values
 			local = 0
-			remote = 1 
+			remote = 1
 		sumE += (local * inSize + remote * outSize) * .001 * dists[j][localCl] * schedule[t,j]
 	model.addConstr(sumE <= float(specs[j][1]), "Bandwidth" + str(j))
 '''
@@ -145,7 +145,7 @@ for j in range(0,len(specs)):
         obj.add(schedule[t,j],schedulingCosts[ty][j])
 
 
-'''#qos terms 
+'''#qos terms
 currUser = tasks[0][0]
 taskNum = -1
 for t in range(0,len(tasks)):
@@ -155,8 +155,8 @@ for t in range(0,len(tasks)):
 		else:
 			taskNum = 0
 			currUser = user
-		localCl = conns[user]	
-		#for each cloudlet	
+		localCl = conns[user]
+		#for each cloudlet
 		for k in range(0,len(specs)):
 			upTime = tasks[t][1] * .01 * dists[k][localCl]
 			downTime = tasks[t][2] * .01 * dists[k][localCl]
@@ -173,7 +173,7 @@ for j in range(0,len(specs)):
 		remote = 1
 		if j == localCl:
 			remote = 0
-		#if not local, add cost of sending packets (normalized to be similar to the schedule/placement costs 
+		#if not local, add cost of sending packets (normalized to be similar to the schedule/placement costs
 		sent = remote * (tasks[t][1] + tasks[t][2])//4
 		obj.add(schedule[t,j],sent)
 '''
@@ -183,7 +183,7 @@ model.setObjective(obj, GRB.MINIMIZE)
 model.optimize()
 
 served = 0
-#qos terms 
+#qos terms
 currUser = tasks[0][0]
 taskNum = -1
 for t in range(0,len(tasks)):
@@ -193,15 +193,15 @@ for t in range(0,len(tasks)):
 		else:
 			taskNum = 0
 			currUser = user
-		localCl = conns[user]	
-		#for each cloudlet	
+		localCl = conns[user]
+		#for each cloudlet
 		for k in range(0,len(specs)):
 			upTime = tasks[t][1] * .001 * dists[k][localCl]
 			downTime = tasks[t][2] * .001 * dists[k][localCl]
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
 			diff = float(qos[user][taskNum])-tot
-			if diff*schedule[t,j] >= 0:
+			if diff*schedule[t,j].X == 1:
 				served  += 1
 
 #print variables
@@ -210,5 +210,5 @@ for v in model.getVars():
 			print(v.Varname, v.X)
 fName = inFile.split('.')[0]
 model.write(fName + ".sol")
-outFile = open("served.log","a+")
+outFile = open(fName+".sol","a+")
 outFile.write(str(served)+","+str(len(tasks))+'\n')

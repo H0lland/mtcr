@@ -9,7 +9,7 @@ def main():
 
 	#initialize
 	vals = []
-	vals.append(["num","edge%","cloud%", "optimal", "qOpt", "Galgorithm","Lalgorithm"])
+	vals.append(["num","edge%","cloud%", "optimal", "qDropped", "Galgorithm","Lalgorithm"])
 	curr = ''
 	sched = 1
 	cloud = 1
@@ -23,7 +23,7 @@ def main():
 		lineLst = lines[i].split(",")
 		pos = lineLst[0].rfind('-')
 		name = lineLst[0][:pos]
-		
+
 		#same name found
 		if name == curr:
 			cloud += int(lineLst[1])
@@ -54,7 +54,7 @@ def main():
 			lalg = int(lineLst[6])
 			ct = 1
 
-	vals.append([curr,edgePerc,cloudPerc,opt/ct,qopt/ct,galg/ct,lalg/ct])	
+	vals.append([curr,edgePerc,cloudPerc,opt/ct,qopt/ct,galg/ct,lalg/ct])
 	#write the data
 	outFile = open(inName+"_avg.csv","w")
 	for i in range(len(vals)):
