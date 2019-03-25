@@ -208,5 +208,3 @@ for v in model.getVars():
 			print(v.Varname, v.X)
 fName = inFile.split('.')[0]
 model.write(fName + ".sol")
-outFile = open("times.log","a+")
-outFile.write(str(model.Runtime)+'\n')

@@ -11,8 +11,8 @@ def main():
 	inFile = open(inName+".qsol","r")
 	lines2 = inFile.readlines()
 	inFile.close()
-	qLine = lines2[-1].split()
-	qCost = qLine[0]/qLine[1]
+	qLine = lines2[-1].split(",")
+	qCost = int(qLine[1])-int(qLine[0])
 
 	gapxFile = open(inName+".gapx","r")
 	gapxLines = gapxFile.readlines()

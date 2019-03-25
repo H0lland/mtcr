@@ -58,6 +58,6 @@ def main():
 	#write the data
 	outFile = open(inName+"_avg.csv","w")
 	for i in range(len(vals)):
-		outFile.write(str(vals[i][0])+","+str(vals[i][1])+","+str(vals[i][2])+","+str(vals[i][3])+","+str(vals[i][4])+","+str(vals[i][5])+str(vals[i][6])+"\n")
+		outFile.write(str(vals[i][0])+","+str(vals[i][1])+","+str(vals[i][2])+","+str(vals[i][3])+","+str(vals[i][4])+","+str(vals[i][5])+","+str(vals[i][6])+"\n")
 	outFile.close()
 main()

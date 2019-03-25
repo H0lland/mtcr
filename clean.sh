@@ -2,4 +2,4 @@
 rm newTest*
 rm outs1/*
 rm times.log
-rm lost.log
+
