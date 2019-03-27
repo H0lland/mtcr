@@ -5,14 +5,14 @@ num=$1
 step=$3
 str='outs1/out'
 out=$5
-qos=20
+qos=25
 beta=30
 servs=1000
 #until [ $beta -gt 80 ]; do
-until [ $qos -gt 40 ]; do
-#until [ $num -gt $2 ]; do
+#until [ $qos -gt 40 ]; do
+until [ $num -gt $2 ]; do
 	counter=0
-	echo -ne "${qos}\t"
+	echo -ne "${num}\t"
 	until [ "${counter}" = "${4}" ]; do	
 		echo -ne "${counter} "
 		./gen.py 4 $num $servs $qos $beta "${str}${num}-${qos}-${counter}"  &> trash.log
@@ -30,8 +30,8 @@ until [ $qos -gt 40 ]; do
 	done
 	echo -e ""
 	#let beta+=$step
-	let qos+=$step	
-	#let num+=$step
+	#let qos+=$step	
+	let num+=$step
 done
 ./average.py ${out} #&> trash.log
 rm trash.log

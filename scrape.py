@@ -12,7 +12,8 @@ def main():
 	lines2 = inFile.readlines()
 	inFile.close()
 	qLine = lines2[-1].split(",")
-	qCost = int(qLine[1])-int(qLine[0])
+	qDrop = int(qLine[1])-int(qLine[0])
+	qCost = int(lines2[1].split("=")[1])
 
 	gapxFile = open(inName+".gapx","r")
 	gapxLines = gapxFile.readlines()
@@ -46,7 +47,7 @@ def main():
 
 	#append data
 	outFile = open(str(outName)+".csv","a+")
-	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(qCost)+","+str(galgCost)+","+str(lalgCost)+"\n")
+	outFile.write(inName+","+str(cloudCnt)+","+str(schedCnt)+","+str(cost)+","+str(qCost)+","+str(qDrop)+","+str(galgCost)+","+str(lalgCost)+"\n")
 	outFile.close()
 
 main()
