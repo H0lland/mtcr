@@ -1,5 +1,5 @@
 #include<iostream>
-#include "objs/cloudlet.h"
+#include "../objs/cloudlet.h"
 #include<vector>
 #include<string.h>
 #include<fstream>
@@ -224,6 +224,78 @@ std::vector<int> selectServices1(vector<cloudlet> cls, vector<service> servs){
 
 //scheduleLocal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
 vector<vector<vector<vector<int>>>> scheduleLocal(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<vector<int>> conns, int alpha){
+	//initializations
+	vector<vector<vector<vector<int>>>> rtn;
+	//create a 2d vec for each cloudlet
+	for(int i = 0 ; i < cls.size(); i++){
+		vector<vector<vector<int>>> clVec(2);
+		rtn.push_back(clVec);
+	}
+	//create a 2d vec for the status of each task
+	vector<vector<bool>> scheded;
+	int remTasks = 0;
+	for(int i =0; i < users.size(); i++){
+		vector<bool> temp;
+		for(int j = 0; j < users.at(i).getTasks().size(); j++){
+			temp.push_back(false);
+			remTasks += 1;
+		}
+		scheded.push_back(temp);
+	}	
+	//for each cloudlet
+	for(int j = 0; j < cls.size() - 1; j++){
+		cout << j << endl;
+		vector<user> conned = cls.at(j).getUsers();
+		int iter = 0;
+		//while you still have resources and haven't checked all conned tasks
+		while(cls.at(j).getRemStor() * cls.at(j).getRemProcs() > 0 && iter < conned.size()){
+			iter += 1;
+			vector<int> qoses;
+			vector<int> indexes;
+			for(int k = 0; k < conned.size(); k++){
+				//for each of that user's tasks
+				for(int l = 0; l < conned.at(k).getTasks().size(); l++){	
+					//if the task hasn't been scheduled
+						int qos = conned.at(k).getQos().at(l);
+						if (!scheded.at(conned.at(k).getKey()).at(l)){
+							indexes.push_back(conned.at(k).getKey());
+							qoses.push_back(qos);
+						}
+				}
+			}
+			//get tightest qos conned to cloudlet j
+			int chosen = minElement(qoses);
+			user u = users.at(indexes.at(chosen));
+			int serv = u.getTasks().at(0).getType().getKey();
+			cls.at(j).reduceStor(servs.at(serv).getPlace());
+			vector<int> s;
+			s.push_back(servs.at(serv).getKey());
+			rtn.at(j).at(0).push_back(s);
+			rtn.at(j).at(1).push_back({u.getKey(),0});
+			cls.at(j).reduceProcs(users.at(u.getKey()).getTasks().at(0).getComp());
+			scheded.at(u.getKey()).at(0) = true;
+		}
+	}
+	int cloud = cls.size()-1;
+	for(int k = 0; k < users.size(); k++){
+		for(int l = 0; l < users.at(k).getTasks().size(); l++){
+			if(!scheded.at(k).at(l)){
+				int serv = users.at(k).getTasks().at(l).getType().getKey();	
+				cls.at(cloud).reduceStor(servs.at(serv).getPlace());
+				vector<int> s;	
+				s.push_back(servs.at(serv).getKey());
+				rtn.at(cloud).at(0).push_back(s);
+				rtn.at(cloud).at(1).push_back({k,0});
+				cls.at(cloud).reduceProcs(users.at(k).getTasks().at(l).getComp());
+				scheded.at(users.at(k).getKey()).at(0) = true;
+			}
+		}
+	}
+	return rtn;
+}
+
+//scheduleLocal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
+vector<vector<vector<vector<int>>>> scheduleLocalQoS(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<vector<int>> conns, int alpha){
 	//initializations
 	vector<vector<vector<vector<int>>>> rtn;
 	//create a 2d vec for each cloudlet
