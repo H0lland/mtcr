@@ -398,6 +398,7 @@ vector<vector<vector<vector<int>>>> scheduleGlobalQoS(vector<cloudlet> cls, vect
 	while (remTasks > 0 && iter < 100){	
 		iter += 1;
 		for(int k = 0; k < users.size(); k++){
+			int diffs = 0;
 			//for each of that user's tasks
 			for(int l = 0; l < users.at(k).getTasks().size(); l++){	
 				//if the task hasn't been scheduled
@@ -423,6 +424,7 @@ vector<vector<vector<vector<int>>>> scheduleGlobalQoS(vector<cloudlet> cls, vect
 										double down = u.getTasks().at(0).getOut() * .001;
 										double total = up + down + u.getTasks().at(0).getComp();
 										int diff = int(total - u.getQos().at(0));
+										diffs += diff;
 										vector<int> t{ kPri, lPri, diff};
 										jTasks.push_back(t);	
 									}
@@ -431,7 +433,7 @@ vector<vector<vector<vector<int>>>> scheduleGlobalQoS(vector<cloudlet> cls, vect
 						}	
 						tasks.push_back(jTasks);
 						//factor in remaining storage (push to cloud if you can)
-						prof = prof * cls.at(j).getRemStor()*cls.at(j).getRemProcs();
+						prof = prof * cls.at(j).getRemStor()*cls.at(j).getRemProcs()-diffs;
 						//if on cloudlet, consider alpha cost
 						if(j < cls.size()-1){
 							prof = prof / alpha;
