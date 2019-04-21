@@ -8,7 +8,7 @@ import sys
 #inFile = input("Config name: ")
 inFile = sys.argv[1]
 #beta = int(sys.argv[2])/10
-penalty = sys.argv[2]
+penalty = float(sys.argv[2])
 file = open(inFile+".gcon","r")
 lines = file.readlines()
 
@@ -129,9 +129,6 @@ for j in range(0,len(specs)):
 		ty = tasks[t][4]
 		model.addConstr(schedule[t,j] <= placing[ty,j],"Service Existance")
 
-
-
-
 #objective function
 obj = model.getObjective()
 
@@ -163,10 +160,8 @@ for t in range(0,len(tasks)):
 			downTime = tasks[t][2] * .001 * dists[k][localCl]
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
-			diff = float(qos[user][taskNum])-tot
-			if(t == 1 and k == 4):
-				print("flag:",tot,qos[user][taskNum],diff)
-			obj.add(schedule[t,j],diff*penalty)
+			diff = tot-float(qos[user][taskNum])
+			obj.add(schedule[t,j],max(0,diff*penalty))
 
 '''#qos terms
 currUser = tasks[0][0]

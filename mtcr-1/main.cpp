@@ -576,7 +576,7 @@ vector<vector<int>> arrayify(string line){
 	return rtn;
 }
 
-int costOf(vector<vector<vector<vector<int>>>> answer, vector<int> placeCosts, vector<vector<int>> schedCosts, vector<user> users){
+int costOf(vector<vector<vector<vector<int>>>> answer, vector<int> placeCosts, vector<vector<int>> schedCosts, vector<user> users,int penalty){
 	//initializations
 	int cost = 0;
 	//loops for each cloudlet
@@ -599,6 +599,12 @@ int costOf(vector<vector<vector<vector<int>>>> answer, vector<int> placeCosts, v
 							int serv = users.at(currU).getTasks().at(val).getType().getKey();
 							cost += schedCosts.at(serv).at(i);
 						}
+						//penalty
+						if(l == 2){
+							if(answer.at(i).at(j).at(k).at(l) > 0){
+								cost += penalty * answer.at(i).at(j).at(k).at(l);
+							}
+						}
 					}
 				}
 			}
@@ -608,11 +614,12 @@ int costOf(vector<vector<vector<vector<int>>>> answer, vector<int> placeCosts, v
 }
 
 int main(int argc, char** argv){
-	if(argc < 3){
-		cout << "Improper usage: ./main inFile beta_value" << endl;
+	if(argc < 4){
+		cout << "Improper usage: ./main inFile beta_value penalty" << endl;
 	}
 	string fn = argv[1];
 	int beta = std::stoi(argv[2])/10;
+	int penalty = std::stoi(argv[3]);
 	ofstream outFile1;
 	ofstream outFile2;
 	outFile1.open(fn+".gapx");	
@@ -651,7 +658,7 @@ int main(int argc, char** argv){
 		sched.push_back(temp);	
 	}*/
 	vector<vector<vector<vector<int>>>> answer = scheduleGlobalQoS(cls, users, dists, servs, in.at(1), beta);
-	//outFile1 << "Algorithm Cost: " << costOf(answer, place, sched,  users) << endl;
+	outFile1 << "Algorithm Cost: " << costOf(answer, place, sched, users, penalty) << endl;
 	for(int i = 0; i < answer.size(); i++){
 		outFile1 << i << ":" << endl;
 		for(int j = 0; j < 2; j++){
