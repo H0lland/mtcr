@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.7
-#usage: ./mtcr.py fileName
+#usage: ./mtcr.py fileName penalty
 from gurobipy import *
 from random import randrange
 import sys
@@ -161,7 +161,9 @@ for t in range(0,len(tasks)):
 			procTime = tasks[t][3]
 			tot = upTime + float(procTime) + downTime
 			diff = tot-float(qos[user][taskNum])
-			obj.add(schedule[t,j],max(0,diff*penalty))
+			if diff > 0:
+				print(t,k,diff)
+			obj.add(schedule[t,k],max(0,diff*penalty))
 
 '''#qos terms
 currUser = tasks[0][0]
