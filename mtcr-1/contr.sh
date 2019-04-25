@@ -7,7 +7,8 @@ str='outs1/out'
 out=$5
 qos=25
 beta=30
-penalty=5
+penalty=10
+thresh=0
 servs=1000
 #until [ $beta -gt 80 ]; do
 #until [ $qos -gt 40 ]; do
@@ -23,10 +24,10 @@ until [ $num -gt $2 ]; do
 				
 		if [ -e "${str}${num}-${qos}-${counter}.sol" ]
 		then
-			./main "${str}${num}-${qos}-${counter}" $beta $penalty &> trash.log
+			./main "${str}${num}-${qos}-${counter}" $beta $penalty $thresh &> trash.log
 			./scrape.py "${str}${num}-${qos}-${counter}" ${out} #&> trash.log	
 		fi
-		let counter+=1 	
+		let counter+=1
 	done
 	echo -e ""
 	#let beta+=$step

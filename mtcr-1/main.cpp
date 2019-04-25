@@ -136,9 +136,50 @@ bool servible(int pos, user U, cloudlet cl, vector<vector<int>> dists, vector<ve
 		double up = tas.getIn() * .001 * dist;
 		double down = tas.getOut() * .001 * dist;
 		double total = up + down + tas.getComp();
+		double diff = total - U.getQos().at(pos);
 		if(total > U.getQos().at(pos)){
 			servi = 0;
 		}*/
+	}
+	return servi;
+}
+
+//Servible1: determine if a task is servible by a cloudlet (assuming the proper service is placed on that cloudlet, given a threshold value
+bool servible1(int pos, user U, cloudlet cl, vector<vector<int>> dists, vector<vector<int>> conns, double thresh){
+	//initializations
+	bool flag = false;
+	bool servi = 1;	
+	task tas = U.getTasks().at(pos);
+	service serv = tas.getType();
+	int key = U.getKey();		
+	int local = conns.at(0).at(key);	
+	vector<user> users = cl.getUsers();
+	
+	if(tas.getComp() > cl.getRemProcs()){ //task requires more processing than cloudlet has
+		servi = 0;
+	}	
+	/*if(not local && servible){ //if not local and still servible check
+		//task requires more band than cloudlet has
+		if(tas.getIn() + tas.getOut() > cl.getRemBand()){ 
+			servible = 0;
+		}
+	}
+	if(servible){ 
+		//if task requires more storage than cloudlet has
+		if(serv.getStor() > cl.getRemStor()){
+			servible = 0;
+		}
+	}*/
+	if(servi){
+		//if task cannot be completed in time
+		double dist = double(dists.at(local).at(cl.getKey()));
+		double up = tas.getIn() * .001 * dist;
+		double down = tas.getOut() * .001 * dist;
+		double total = up + down + tas.getComp();
+		double diff = total - U.getQos().at(pos);
+		if(total > U.getQos().at(pos)){
+			servi = 0;
+		}
 	}
 	return servi;
 }
@@ -378,10 +419,11 @@ vector<vector<vector<vector<double>>>> scheduleLocalQoS(vector<cloudlet> cls, ve
 	return rtn;
 }
 
-//scheduleGlobal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
+//scheduleGlobalQoS: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
 vector<vector<vector<vector<double>>>> scheduleGlobalQoS(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<vector<int>> conns, int alpha){
 	//initializations
 	vector<vector<vector<vector<double>>>> rtn;
+	double penalty = 5.0;
 	//create a 2d vec for each cloudlet
 	for(int i = 0 ; i < cls.size(); i++){
 		vector<vector<vector<double>>> clVec(2);
@@ -440,7 +482,7 @@ vector<vector<vector<vector<double>>>> scheduleGlobalQoS(vector<cloudlet> cls, v
 						}	
 						tasks.push_back(jTasks);
 						//factor in remaining storage (push to cloud if you can)
-						prof = prof * cls.at(j).getRemStor()*cls.at(j).getRemProcs()-diffs;
+						prof = prof * cls.at(j).getRemStor()*cls.at(j).getRemProcs()+diffs*penalty;
 						//if on cloudlet, consider alpha cost
 						if(j < cls.size()-1){
 							prof = prof / alpha;
@@ -471,6 +513,99 @@ vector<vector<vector<vector<double>>>> scheduleGlobalQoS(vector<cloudlet> cls, v
 	return rtn;
 }
 
+//scheduleGlobalQoS1: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks, considering a threshold
+vector<vector<vector<vector<double>>>> scheduleGlobalQoS1(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<vector<int>> conns, int alpha, double thresh){
+	//initializations
+	vector<vector<vector<vector<double>>>> rtn;
+	double penalty = 5.0;
+	//create a 2d vec for each cloudlet
+	for(int i = 0 ; i < cls.size(); i++){
+		vector<vector<vector<double>>> clVec(2);
+		rtn.push_back(clVec);
+	}
+	//create a 2d vec for the status of each task
+	vector<vector<bool>> scheded;
+	int remTasks = 0;
+	for(int i =0; i < users.size(); i++){
+		vector<bool> temp;
+		for(int j = 0; j < users.at(i).getTasks().size(); j++){
+			temp.push_back(false);
+			remTasks += 1;
+		}
+		scheded.push_back(temp);
+	}	
+	//while there's remaining tasks
+	int iter = 0;
+	while (remTasks > 0 && iter < 100){	
+		iter += 1;
+		for(int k = 0; k < users.size(); k++){
+			int diffs = 0;
+			//for each of that user's tasks
+			for(int l = 0; l < users.at(k).getTasks().size(); l++){	
+				//if the task hasn't been scheduled
+				if(!scheded.at(k).at(l)){	
+					vector<double> profits;
+					vector<vector<vector<double>>> tasks;
+					int i = users.at(k).getTasks().at(l).getType().getKey();
+					//for each cloudlet
+					for(int j = 0; j < cls.size(); j++){		
+						double prof = 0;
+						vector<vector<double>> jTasks;
+						//for each user
+						for(int kPri = k; kPri < users.size(); kPri++){
+							for(int lPri = l; lPri < users.at(kPri).getTasks().size(); lPri++){
+								//if the task hasn't been scheduled and is of type i
+								if(!scheded.at(kPri).at(lPri) && users.at(kPri).getTasks().at(lPri).getType()==servs.at(i)){	
+									//if the task is servible by cloudlet
+									if(servible1(lPri, users.at(kPri), cls.at(j),dists, conns, thresh)){	
+										//add profit
+										prof += 1;
+										user u = users.at(kPri);
+										int key = u.getKey();
+										int local = conns.at(0).at(key);
+										double up = u.getTasks().at(0).getIn() * .001 * dists.at(local).at(j);
+										double down = u.getTasks().at(0).getOut() * .001 * dists.at(local).at(j);
+										double total = up + down + u.getTasks().at(0).getComp();
+										double diff = (total - u.getQos().at(0));
+										diffs += diff;
+										vector<double> t{ kPri, lPri, diff};
+										jTasks.push_back(t);	
+									}
+								}
+							}
+						}	
+						tasks.push_back(jTasks);
+						//factor in remaining storage (push to cloud if you can)
+						prof = prof * cls.at(j).getRemStor()*cls.at(j).getRemProcs()+diffs*penalty;
+						//if on cloudlet, consider alpha cost
+						if(j < cls.size()-1){
+							prof = prof / alpha;
+						}
+						profits.push_back(prof);	
+					}	
+					//choose largest
+					int chosen = maxElement(profits);	
+					//add the service and tasks to that cloudlet's lists
+					if(profits.at(chosen) > 0){
+						vector<double> s;
+						cls.at(chosen).reduceStor(servs.at(i).getPlace());
+						s.push_back(servs.at(i).getKey());		
+						rtn.at(chosen).at(0).push_back(s);	
+						for(int x = 0; x < tasks.at(chosen).size(); x++){	
+							rtn.at(chosen).at(1).push_back(tasks.at(chosen).at(x));	
+							int U = tasks.at(chosen).at(x).at(0);
+							int pos = tasks.at(chosen).at(x).at(1);	
+							cls.at(chosen).reduceProcs(users.at(U).getTasks().at(pos).getComp());
+							scheded.at(U).at(pos) = true;
+							remTasks -= 1;
+						}
+					}
+				}
+			}
+		}
+	}
+	return rtn;
+}
 //scheduleGlobal: takes cloudlets, users, dists, and the chosen services and distributes services and schedules tasks
 vector<vector<vector<vector<int>>>> scheduleGlobal(vector<cloudlet> cls, vector<user> users, vector<vector<int>> dists, vector<service> servs, vector<vector<int>> conns, int alpha){
 	//initializations
@@ -610,8 +745,7 @@ int costOf(vector<vector<vector<vector<double>>>> answer, vector<int> placeCosts
 						}
 						//penalty
 						if(l == 2){
-							if(answer.at(i).at(j).at(k).at(l) > 0){
-								cout << "Here" << endl;
+							if(answer.at(i).at(j).at(k).at(l) > 0){	
 								cost += penalty * answer.at(i).at(j).at(k).at(l);
 							}
 						}
@@ -624,16 +758,20 @@ int costOf(vector<vector<vector<vector<double>>>> answer, vector<int> placeCosts
 }
 
 int main(int argc, char** argv){
-	if(argc < 4){
-		cout << "Improper usage: ./main inFile beta_value penalty" << endl;
+	if(argc < 5){
+		cout << "Improper usage: ./main inFile beta_value penalty thresh" << endl;
 	}
 	string fn = argv[1];
 	int beta = std::stoi(argv[2])/10;
 	int penalty = std::stoi(argv[3]);
+	double thresh = std::stof(argv[4]);
+	ofstream outFile0;
 	ofstream outFile1;
 	ofstream outFile2;
+	outFile0.open(fn+".gtapx");
 	outFile1.open(fn+".gapx");	
 	outFile2.open(fn+".lapx");
+	cout << "774" << endl;
 	vector<vector<vector<int>>> in = parseIn(fn);	
 	vector<service> servs = makeServices(in.at(5));	
 	vector<cloudlet> cls = makeCloudlets(in.at(0));
@@ -641,12 +779,6 @@ int main(int argc, char** argv){
 	vector<task> tasks = makeTasks(in.at(4),servs);
 	vector<user> users = makeUsers(in.at(2),tasks);
 	connect(cls,users,in.at(1));	
-	/*cout << "Selecting...";
-	vector<int> chosen = selectServices1(cls,servs);
-	cout << "\nSelected!" << endl;*/
-	/*for(int i = 0; i < chosen.size(); i++){
-		cout << chosen.at(i) << endl;
-	}*/
 	//make placeCost vector
 	vector<int> place;	
 	for(int i = 0; i < servs.size(); i++){
@@ -654,20 +786,32 @@ int main(int argc, char** argv){
 	}
 	//make schedCost vector
 	vector<vector<int>> sched = in.at(6);
-	/*for(int i = 0; i < cls.size(); i++){
-		vector<int> temp;
-		for(int j = 0; j < servs.size(); j++){
-			#if a cloudlet
-			if(i < cls.size()-1){
-				temp.push_back(beta * servs.at(j).getSched());
+	cout << "789"<<endl;
+	//get answer for .gtapx	
+	vector<vector<vector<vector<double>>>> answer0 = scheduleGlobalQoS1(cls, users, dists, servs, in.at(1), beta, thresh);
+	//make .gtapx
+	outFile0 << "Algorithm Cost: " << costOf(answer0, place, sched, users, penalty) << endl;
+	for(int i = 0; i < answer0.size(); i++){
+		outFile0 << i << ":" << endl;
+		for(int j = 0; j < 2; j++){
+			if(j == 0)
+				outFile0 << "placed:" << '\t';
+			else
+				outFile0 << "sched:" << '\t';
+			for(int k = 0; k < answer0.at(i).at(j).size(); k++){
+				for(int l = 0; l < answer0.at(i).at(j).at(k).size(); l++){
+					outFile0 << answer0.at(i).at(j).at(k).at(l) << ",";
+				}
+				outFile0 << ";";
 			}
-			else{
-				temp.push_back(servs.at(j).getSched());
-			}
+			outFile0 << endl;
 		}
-		sched.push_back(temp);	
-	}*/
+	}
+	outFile0.close();
+	cout << "811"<<endl;
+	//get answer for .gapx	
 	vector<vector<vector<vector<double>>>> answer = scheduleGlobalQoS(cls, users, dists, servs, in.at(1), beta);
+	//make .gapx
 	outFile1 << "Algorithm Cost: " << costOf(answer, place, sched, users, penalty) << endl;
 	for(int i = 0; i < answer.size(); i++){
 		outFile1 << i << ":" << endl;
@@ -686,7 +830,10 @@ int main(int argc, char** argv){
 		}
 	}
 	outFile1.close();
+	cout<<"833"<<endl;
+	//get answer for .lapx
 	vector<vector<vector<vector<double>>>> answer2 = scheduleLocalQoS(cls, users, dists, servs, in.at(1), beta);
+	//make .lapx
 	outFile2<< "Algorithm Cost: " << costOf(answer2, place, sched,  users, penalty) << endl;
 	for(int i = 0; i < answer2.size(); i++){
 		outFile2 << i << ":" << endl;

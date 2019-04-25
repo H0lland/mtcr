@@ -18,3 +18,7 @@ tests/
 *.lapx
 
 *.qsol
+
+mtcr-1/outs1/
+
+*.csv

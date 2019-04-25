@@ -9,13 +9,14 @@ def main():
 
 	#initialize
 	vals = []
-	vals.append(["num","edge%","cloud%", "optimal", "Galgorithm","Lalgorithm"])
+	vals.append(["num","edge%","cloud%", "optimal", "Galgorithm","Lalgorithm","Gtalgorithm"])
 	curr = ''
 	sched = 1
 	cloud = 1
 	opt = 0
 	galg = 0
 	lalg = 0
+	gtalg = 0
 	ct = 1
 	#count averages for each unique user/qos setup
 	for i in range(len(lines)):
@@ -30,6 +31,7 @@ def main():
 			opt += float(lineLst[3])
 			galg += float(lineLst[4])
 			lalg += float(lineLst[5])
+			gtalg += float(lineLst[6])
 			ct += 1
 
 		#else, total averages and start over
@@ -40,7 +42,8 @@ def main():
 			opt /= ct
 			galg /= ct
 			lalg /= ct
-			vals.append([curr,edgePerc,cloudPerc, opt, galg,lalg])
+			gtalg /= ct
+			vals.append([curr,edgePerc,cloudPerc, opt, galg, lalg, gtalg])
 			#reset
 			curr = name
 			cloud = int(lineLst[1])
@@ -48,12 +51,13 @@ def main():
 			opt = float(lineLst[3])
 			galg = float(lineLst[4])
 			lalg = float(lineLst[5])
+			gtalg = float(lineLst[6])
 			ct = 1
 
-	vals.append([curr,edgePerc,cloudPerc,opt/ct,galg/ct,lalg/ct])
+	vals.append([curr,edgePerc,cloudPerc,opt/ct,galg/ct,lalg/ct,gtalg/ct])
 	#write the data
 	outFile = open(inName+"_avg.csv","w")
 	for i in range(len(vals)):
-		outFile.write(str(vals[i][0])+","+str(vals[i][1])+","+str(vals[i][2])+","+str(vals[i][3])+","+str(vals[i][4])+","+str(vals[i][5])+"\n")
+		outFile.write(str(vals[i][0])+","+str(vals[i][1])+","+str(vals[i][2])+","+str(vals[i][3])+","+str(vals[i][4])+","+str(vals[i][5])+","+str(vals[i][6])+"\n")
 	outFile.close()
 main()
