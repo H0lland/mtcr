@@ -8,10 +8,15 @@ def main():
 	lapxFile = open(inName+".lapx","r")
 	lapxLines = lapxFile.readlines()
 	lapxFile.close()
+	gtapxFile = open(inName+".gtapx","r")
+	gtapxLines = gtapxFile.readlines()
+	gtapxFile.close()
 	gTot = 0
 	lTot = 0
+	gtTot = 0
 	for i in range(3,len(gapxLines),3):
 		gTot += gapxLines[i].count(';')
 		lTot += lapxLines[i].count(';')
-	print(gTot, lTot)		
+		gtTot += gtapxLines[i].count(';')
+	print(gTot, lTot, gtTot)		
 main()
